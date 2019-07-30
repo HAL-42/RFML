@@ -1,0 +1,17 @@
+# Ignore Python Cache
+*__pycache__
+__pycache__/
+*.pyo
+*.pyc
+
+*.csv
+*.h5
+*.Setup
+output.finished/*
+output/*
+
+.vscode/
+.idea/
+
+Paper/
+temp/
