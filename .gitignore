@@ -7,6 +7,7 @@ __pycache__/
 *.csv
 *.h5
 *.Setup
+*.txt
 output.finished/*
 output/*
 
