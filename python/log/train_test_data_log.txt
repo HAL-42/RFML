@@ -1,0 +1,38 @@
+2019-07-30 01:08:10,918 - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:283] - INFO: For Each Module, sample num = 10379, train_num = 8303, test_num = 2076
+2019-07-30 02:15:21,997 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:282] - INFO: For Each Module, sample num = 10379, train_num = 8303, test_num = 2076
+2019-07-30 02:16:08,265 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:282] - INFO: For Each Module, sample num = 10379, train_num = 8303, test_num = 2076
+2019-07-30 02:16:08,286 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:292] - INFO: Start Saving Train List
+2019-07-30 02:16:08,291 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:239] - INFO: In List train, Processing Samples from 0 to 41515
+2019-07-30 02:17:06,820 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:253] - INFO: Saving train
+2019-07-30 03:28:44,968 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:287] - INFO: For Each Module, sample num = 10379, train_num = 8303, test_num = 2076
+2019-07-30 03:28:44,988 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:297] - INFO: Start Saving Train List
+2019-07-30 03:28:44,988 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:241] - INFO: In List train, Processing Samples from 0 to 41515
+2019-07-30 03:29:43,289 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:257] - INFO: Saving train
+2019-07-30 03:30:52,889 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:287] - INFO: For Each Module, sample num = 10379, train_num = 8303, test_num = 2076
+2019-07-30 03:30:52,935 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:297] - INFO: Start Saving Train List
+2019-07-30 03:30:52,936 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:241] - INFO: In List train, Processing Samples from 0 to 41515
+2019-07-30 03:31:56,379 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:257] - INFO: Saving train
+2019-07-30 03:32:07,111 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:299] - INFO: Start Saving Test List
+2019-07-30 03:32:07,112 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:241] - INFO: In List test, Processing Samples from 0 to 10380
+2019-07-30 03:32:22,330 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:257] - INFO: Saving test
+2019-07-30 03:40:57,158 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:287] - INFO: For Each Module, sample num = 10379, train_num = 8303, test_num = 2076
+2019-07-30 03:40:57,190 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:297] - INFO: Start Saving Train List
+2019-07-30 03:40:57,190 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:241] - INFO: In List train, Processing Samples from 0 to 41515
+2019-07-30 03:41:50,670 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:257] - INFO: Saving train
+2019-07-30 03:42:00,979 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:299] - INFO: Start Saving Test List
+2019-07-30 03:42:00,979 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:241] - INFO: In List test, Processing Samples from 0 to 10380
+2019-07-30 03:42:18,564 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:257] - INFO: Saving test
+2019-07-30 03:54:07,955 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:287] - INFO: For Each Module, sample num = 10379, train_num = 8303, test_num = 2076
+2019-07-30 03:54:07,988 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:299] - INFO: Start Saving Train List
+2019-07-30 03:54:07,988 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:241] - INFO: In List train, Processing Samples from 0 to 41515
+2019-07-30 03:54:59,025 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:257] - INFO: Saving train
+2019-07-30 03:55:10,094 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:301] - INFO: Start Saving Test List
+2019-07-30 03:55:10,094 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:241] - INFO: In List test, Processing Samples from 0 to 10380
+2019-07-30 03:55:26,511 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:257] - INFO: Saving test
+2019-07-30 12:04:14,640 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:287] - INFO: For Each Module, sample num = 8537, train_num = 6829, test_num = 1708
+2019-07-30 12:04:14,800 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:299] - INFO: Start Saving Train List
+2019-07-30 12:04:14,800 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:241] - INFO: In List train, Processing Samples from 0 to 34145
+2019-07-30 12:05:03,997 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:257] - INFO: Saving train
+2019-07-30 12:05:13,156 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:301] - INFO: Start Saving Test List
+2019-07-30 12:05:13,156 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:241] - INFO: In List test, Processing Samples from 0 to 8540
+2019-07-30 12:05:24,313 - .\log\train_test_data_log.txt - D:/Win/Doc/#Project/RFML/python/data_processing.py[line:257] - INFO: Saving test
