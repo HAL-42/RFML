@@ -11,6 +11,7 @@
 
 import logging
 from logging import handlers
+import sys
 
 class Logger(object):
     level_relations = {
@@ -30,7 +31,7 @@ class Logger(object):
         sh_format_str = logging.Formatter('%(asctime)s - [line:%(lineno)d] - %(levelname)s: %(message)s')
         self.logger.setLevel(self.level_relations.get(level))#设置日志级别
 
-        sh = logging.StreamHandler()#往屏幕上输出
+        sh = logging.StreamHandler(sys.stdout)#往屏幕上输出
         sh.setFormatter(sh_format_str) #设置屏幕上显示的格式
         self.logger.addHandler(sh) #把对象加到logger里
 

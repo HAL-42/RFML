@@ -29,7 +29,6 @@ class ProcessBar(object):
 
         self._PrintBar()
 
-
     def _PrintBar(self):
         show_lines_num  = int(np.round(self.lines_num * self.current_percent))
         lines = '|' * show_lines_num + ' ' * (self.lines_num - show_lines_num)

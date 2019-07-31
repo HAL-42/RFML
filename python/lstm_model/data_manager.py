@@ -36,7 +36,8 @@ class DataManager(object):
         # ! Get class list
         self.classes_list = []
         for module_data_name in os.listdir(self.module_data_path):
-            self.classes_list.append(module_data_name.split('.')[0])
+            if module_data_name.split('.')[1] == 'h5':
+                self.classes_list.append(module_data_name.split('.')[0])
         self.classes_num = len(self.classes_list)
         # ! Init train/test index
         self.shuffled_train_index = np.arange(0, self.train_samples_num)
@@ -50,9 +51,9 @@ class DataManager(object):
     def _get_sample(self, phase:str, index):
         if phase ==  'train':
             # ! Find where the sample is
-            h5_name_sample_in = self.train_h5_names[index % self.train_save_step]
+            h5_name_sample_in = self.train_h5_names[int(np.floor(index / self.train_save_step))]
             h5_path_sample_in = os.path.join(self.train_test_data_path, h5_name_sample_in)
-            index_in_h5 = index - self.train_save_step * (index % self.train_save_step)
+            index_in_h5 = index % self.train_save_step
             # ! Read in sample's data
             with h5py.File(h5_path_sample_in, 'r') as hf:
                 I_data = hf['I'][index_in_h5,:]
@@ -74,9 +75,9 @@ class DataManager(object):
                 return x, y
         elif phase == 'test':
             # ! Find where the sample is
-            h5_name_sample_in = self.test_h5_names[index % self.test_save_step]
+            h5_name_sample_in = self.test_h5_names[int(np.floor(index / self.test_save_step))]
             h5_path_sample_in = os.path.join(self.train_test_data_path, h5_name_sample_in)
-            index_in_h5 = index - self.test_save_step * (index % self.test_save_step)
+            index_in_h5 = index % self.train_save_step
             # ! Read in sample's data
             with h5py.File(h5_path_sample_in, 'r') as hf:
                 I_data = hf['I'][index_in_h5, :]
