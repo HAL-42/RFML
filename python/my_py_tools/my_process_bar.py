@@ -61,6 +61,14 @@ class ProcessBar(object):
             print(msg)
         self._PrintBar()
 
+    def Close(self, msg=None, logger=None):
+        print('')
+        if isinstance(msg, str):
+            if logger:
+                logger.info(msg)
+            else:
+                print(msg)
+
 
 if __name__ == "__main__":
     N = 1000

@@ -15,7 +15,6 @@ kH5DataPath = os.path.join('..', 'data', 'h5data.same_mac')
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
 kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
 kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
-kPyLogPath = os.path.join(kLogPath, 'py_log')
 kSnapshotPath = os.path.join(kLogPath, 'snapshot', 'LSTM')
 
 
@@ -42,7 +41,7 @@ if __name__ == '__main__':
 	init = tf.global_variables_initializer()
 
 	saver = tf.train.Saver(max_to_keep=5)
-	logger = Logger(os.path.join(kPyLogPath, 'lstm_train_val.log')).logger
+	logger = Logger(os.path.join(kLogPath, 'lstm_train_val.log')).logger
 	with tf.Session() as sess:
 		# writer
 		train_writer = tf.summary.FileWriter(os.path.join(kLogPath, 'lstm_train'), sess.graph)

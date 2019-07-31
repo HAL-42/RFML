@@ -1,0 +1,2 @@
+2019-07-30 22:04:11,247 - .\log\tf.h5data.same_mac.LSTM.log\lstm_train_val.log - D:/Win/Doc/#Project/RFML/python/lstm_train_val.py[line:55] - INFO: ****** Epoch: 0/10 ******
+2019-07-30 22:04:17,286 - .\log\tf.h5data.same_mac.LSTM.log\lstm_train_val.log - D:/Win/Doc/#Project/RFML/python/lstm_train_val.py[line:74] - INFO: (0/41) loss: 2.4353134632110596, accuracy: 0.1865234375
