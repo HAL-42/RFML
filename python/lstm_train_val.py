@@ -9,7 +9,7 @@ import time
 
 kBatchSize = 1024
 kLearningRate = 0.001
-kNumEpochs = 10
+kNumEpochs = 100
 
 kH5DataPath = os.path.join('..', 'data', 'h5data.same_mac')
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
