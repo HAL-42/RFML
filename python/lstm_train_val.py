@@ -67,8 +67,6 @@ if __name__ == '__main__':
 			for i, train_batch in enumerate(train_batches):
 				# process_bar.UpdateBar(i)
 				print("Read Batch Cost {}s".format(time.time() - read_batch_start_time))
-
-				compute_start_time = time.time()
 				# get corrupted batch using the un-corrupted data_train
 				batch_X, batch_Y = train_batch
 				batch_X = batch_X.reshape(batch_X.shape[0], lstm_model.TIMESTEPS, -1)
@@ -87,7 +85,6 @@ if __name__ == '__main__':
 
 				iteration += 1
 				# Read Batch Start
-				print("Compute Cost {}s".format(time.time() - compute_start_time))
 				read_batch_start_time = time.time()
 			saver.save(sess, kSnapshotPath, global_step=epoch)
 			logger.info("It Cost {}s to finish this epoch".format(time.time() - epoch_start_time))
