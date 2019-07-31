@@ -211,6 +211,7 @@ def GetH5ModuleData(data_path: str, h5_module_data_path: str):
                 I_data[i, :] = np.loadtxt(I_paths[i], dtype=np.float32)
                 Q_data[i, :] = np.loadtxt(Q_paths[i], dtype=np.float32)
                 process_bar.UpdateBar(i + 1)
+            process_bar.Close()
             with h5py.File(os.path.join(h5_module_data_path, module_name+'.h5'), 'w') as hf:
                 hf.create_dataset("I", data=I_data)
                 hf.create_dataset("Q", data=Q_data)

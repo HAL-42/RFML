@@ -63,7 +63,6 @@ if __name__ == '__main__':
 			# iteration
 			process_bar = ProcessBar(batches_num)
 			for i, train_batch in enumerate(train_batches):
-				process_bar.UpdateBar(i)
 				# get corrupted batch using the un-corrupted data_train
 				batch_X, batch_Y = train_batch
 				batch_X = batch_X.reshape(batch_X.shape[0], lstm_model.TIMESTEPS, -1)
@@ -82,6 +81,7 @@ if __name__ == '__main__':
 				_ = sess.run([optimizer], feed_dict={lstm_model.X: batch_X, lstm_model.Y: batch_Y})
 
 				iteration += 1
+				process_bar.UpdateBar(i + 1)
 			process_bar.Close()
 			saver.save(sess, kSnapshotPath, global_step=epoch)
 			logger.info("It Cost {}s to finish this epoch".format(time.time() - epoch_start_time))
