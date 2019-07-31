@@ -22,6 +22,7 @@ class ProcessBar(object):
         self.lines_num = lines_num
 
         self.finished = False
+        self.closed = False
 
         self.current_value = self.start_value
         self.current_percent = self.current_value / self.max_value
@@ -49,7 +50,7 @@ class ProcessBar(object):
         self.current_time = time.time()
         self._PrintBar()
         if current_value == self.max_value:
-            print('\n')
+            self.Close()
             self.finished = True
         return True
 
@@ -62,12 +63,13 @@ class ProcessBar(object):
         self._PrintBar()
 
     def Close(self, msg=None, logger=None):
-        print('')
-        if isinstance(msg, str):
-            if logger:
-                logger.info(msg)
-            else:
-                print(msg)
+        if not self.closed:
+            print('')
+            if isinstance(msg, str):
+                if logger:
+                    logger.info(msg)
+                else:
+                    print(msg)
 
 
 if __name__ == "__main__":

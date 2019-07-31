@@ -71,7 +71,8 @@ if __name__ == '__main__':
 				if iteration % 5 == 0:
 					train_summary, current_loss, current_accuracy = sess.run([merged, loss, accuracy], feed_dict={lstm_model.X: batch_X, lstm_model.Y: batch_Y})
 					train_writer.add_summary(train_summary, iteration)
-					logger.info('({}/{}) loss: {}, accuracy: {}'.format(i, batches_num, current_loss, current_accuracy))
+					process_bar.SkipMsg('({}/{}) loss: {}, accuracy: {}'.format(i, batches_num, current_loss, current_accuracy)
+										, logger)
 
 					test_X, test_Y = data_manager.get_random_test_samples(kBatchSize)
 					test_X = test_X.reshape(test_X.shape[0],  lstm_model.TIMESTEPS, -1)
@@ -81,6 +82,7 @@ if __name__ == '__main__':
 				_ = sess.run([optimizer], feed_dict={lstm_model.X: batch_X, lstm_model.Y: batch_Y})
 
 				iteration += 1
+			process_bar.Close()
 			saver.save(sess, kSnapshotPath, global_step=epoch)
 			logger.info("It Cost {}s to finish this epoch".format(time.time() - epoch_start_time))
 		train_writer.close()
