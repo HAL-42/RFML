@@ -41,7 +41,7 @@ class Logger(object):
         else:
             self.logger = logging.getLogger(filename)
         file_format_str = logging.Formatter(fmt)#设置日志格式
-        sh_format_str = cl.ColoredFormatter('%(log_color)s[line:%(lineno)d]: %(message)s',log_colors=log_colors_config)
+        sh_format_str = cl.ColoredFormatter('%(log_color)s%(asctime)s - [line:%(lineno)d]: %(message)s',log_colors=log_colors_config)
         self.logger.setLevel(self.level_relations.get(level))#设置日志级别
 
         sh = logging.StreamHandler(sys.stdout)#往屏幕上输出
