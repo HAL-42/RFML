@@ -62,11 +62,9 @@ if __name__ == '__main__':
 			train_batches = data_manager.get_train_batches(kBatchSize)
 
 			# iteration
-			# process_bar = ProcessBar(batches_num)
-			read_batch_start_time = time.time()
+			process_bar = ProcessBar(batches_num)
 			for i, train_batch in enumerate(train_batches):
-				# process_bar.UpdateBar(i)
-				print("Read Batch Cost {}s".format(time.time() - read_batch_start_time))
+				process_bar.UpdateBar(i)
 				# get corrupted batch using the un-corrupted data_train
 				batch_X, batch_Y = train_batch
 				batch_X = batch_X.reshape(batch_X.shape[0], lstm_model.TIMESTEPS, -1)
@@ -84,8 +82,6 @@ if __name__ == '__main__':
 				_ = sess.run([optimizer], feed_dict={lstm_model.X: batch_X, lstm_model.Y: batch_Y})
 
 				iteration += 1
-				# Read Batch Start
-				read_batch_start_time = time.time()
 			saver.save(sess, kSnapshotPath, global_step=epoch)
 			logger.info("It Cost {}s to finish this epoch".format(time.time() - epoch_start_time))
 		train_writer.close()
