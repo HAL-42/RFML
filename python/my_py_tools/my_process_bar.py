@@ -14,7 +14,7 @@ import numpy as np
 
 class ProcessBar(object):
 
-    def __init__(self, max_value, start_value = 0, percent_step = 0.01, lines_num = 50):
+    def __init__(self, max_value, start_value=0, percent_step=0.01, lines_num=50):
         self.start_time = time.time()
         self.max_value = max_value
         self.start_value = start_value
@@ -27,14 +27,16 @@ class ProcessBar(object):
         self.current_percent = self.current_value / self.max_value
         self.current_time = self.start_time
 
+        self.show_str = ''
         self._PrintBar()
 
     def _PrintBar(self):
-        show_lines_num  = int(np.round(self.lines_num * self.current_percent))
+        show_lines_num = int(np.round(self.lines_num * self.current_percent))
         lines = '|' * show_lines_num + ' ' * (self.lines_num - show_lines_num)
-        print("{percent:2d}%[{lines}]{delta_time:.2f}s".
-              format(**{'percent': int(np.round(self.current_percent * 100)), 'lines': lines,
-                      'delta_time': time.time() - self.start_time}), end='\r')
+        self.show_str = "{percent:2d}%[{lines}]{delta_time:.2f}s".\
+            format(**{'percent': int(np.round(self.current_percent * 100)), 'lines': lines,
+                        'delta_time': time.time() - self.start_time})
+        print(self.show_str, end='\r')
 
     def UpdateBar(self, current_value):
         if self.finished:
@@ -50,6 +52,14 @@ class ProcessBar(object):
             print('\n')
             self.finished = True
         return True
+
+    def SkipMsg(self, msg: str, logger=None):
+        print(' ' * (len(self.show_str) + 1), end='\r')
+        if logger:
+            logger.info(msg)
+        else:
+            print(msg)
+        self._PrintBar()
 
 
 if __name__ == "__main__":

@@ -28,7 +28,7 @@ class Logger(object):
         else:
             self.logger = logging.getLogger(filename)
         file_format_str = logging.Formatter(fmt)#设置日志格式
-        sh_format_str = logging.Formatter('%(asctime)s - [line:%(lineno)d] - %(levelname)s: %(message)s')
+        sh_format_str = logging.Formatter('[line:%(lineno)d]: %(message)s')
         self.logger.setLevel(self.level_relations.get(level))#设置日志级别
 
         sh = logging.StreamHandler(sys.stdout)#往屏幕上输出
