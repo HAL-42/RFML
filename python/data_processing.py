@@ -243,7 +243,7 @@ def _List2H5(sample_list: list , file_prefix:str ,h5_module_data_path: str,
         # ! Get I, Q, Labels Data
         I_data = np.empty((i2 - i1, kSampleLen), dtype=np.float32)
         Q_data = np.empty((i2 - i1, kSampleLen), dtype=np.float32)
-        labels = np.empty((i2 - i1,), dtype=np.str)
+        labels = np.empty((i2 - i1,), dtype=np.object)
         process_bar = ProcessBar(i2 - i1)
         for i, sample in enumerate(sample_list[i1:i2]):
             with h5py.File(os.path.join(h5_module_data_path, sample[0]+'.h5'), 'r') as hf:
