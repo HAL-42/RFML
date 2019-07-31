@@ -9,9 +9,18 @@
 @desc:
 """
 
+
 class MyError(Exception):
-    def __init__(self, value):
+
+    def __init__(self, value = None, msg = 'An Error Occurred'):
         self.value = value
+        self.msg = msg
 
     def __str__(self):
-        return repr(self.value)
+        return self.msg
+
+
+class IllegalPhaseError(MyError):
+
+    def __init__(self, msg = "Illegal Phase Error"):
+        super(IllegalPhaseError, self).__init__(msg = msg)

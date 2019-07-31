@@ -16,3 +16,6 @@ __pycache__/
 
 Paper/
 temp/
+
+snapshot/
+*.HAL42
