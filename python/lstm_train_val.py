@@ -15,7 +15,7 @@ kH5DataPath = os.path.join('..', 'data', 'h5data.same_mac')
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
 kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
 kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
-kPyLogPath = os.path.join('.', 'log')
+kPyLogPath = os.path.join(kLogPath, 'py_log')
 kSnapshotPath = os.path.join(kLogPath, 'snapshot', 'LSTM')
 
 
