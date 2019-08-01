@@ -78,4 +78,4 @@ if __name__ == "__main__":
     for i in range(N):
         process_bar.UpdateBar(i)
         time.sleep(0.001)
-    print('HAHA')
+    print('Test')
