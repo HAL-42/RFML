@@ -13,6 +13,7 @@ import numpy as np
 import json
 from my_py_tools.my_exception import IllegalPhaseError
 import h5py
+import re
 
 
 class DataManager(object):
@@ -35,9 +36,13 @@ class DataManager(object):
             self.test_h5_names = test_info['h5_names']
         # ! Get class list
         self.classes_list = []
-        for module_data_name in os.listdir(self.module_data_path):
-            if module_data_name.split('.')[1] == 'h5':
-                self.classes_list.append(module_data_name.split('.')[0])
+        module_data_txt = os.path.join(module_data_path, os.path.split(module_data_path)[1] + '.txt')
+        with open(module_data_txt) as txt_f:
+            while True:
+                line = txt_f.readline()
+                if not line:
+                    break
+                self.classes_list.append(re.match("(\S+) \d+", line).group(1))
         self.classes_num = len(self.classes_list)
         # ! Init train/test index
         self.shuffled_train_index = np.arange(0, self.train_samples_num)
