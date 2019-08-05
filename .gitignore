@@ -19,3 +19,7 @@ temp/
 
 snapshot/
 *.HAL42
+
+#log
+**/log
+*.log
