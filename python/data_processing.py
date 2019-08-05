@@ -24,11 +24,10 @@ import json
 from my_py_tools.my_process_bar import ProcessBar
 
 
-kDataPath = os.path.join('..', 'data', 'data.diff_mac')
-kH5DataPath = os.path.join('..', 'data', 'h5data.diff_mac')
+# kDataPath = os.path.join('..', 'data', 'data.diff_mac')
+kDataPath = "F:\\diff_module_same_mac_43"
+kH5DataPath = os.path.join('..', 'data', 'h5diff_module_same_mac_43')
 kLogPath = os.path.join('.', 'log')
-if not os.path.isdir(kLogPath):
-    os.mkdir(kLogPath)
 
 kCSVHeaderLen = 10
 kSampleLen = 10000
@@ -185,6 +184,10 @@ def GetH5ModuleData(data_path: str, h5_module_data_path: str):
             logger.info('-------------------------------------')
             logger.info('Processing Data In' + wifi_module_path)
             module_name = os.path.split(wifi_module_path)[1]
+            # ! If corespondent h5 already exits, skip this module
+            if os.path.isfile(os.path.join(h5_module_data_path, module_name + '.h5')):
+                logger.warning("{}'s corespondent h5 already exits, skip this module!")
+                continue
             # ! Convert only if output dir exits
             assert os.path.isdir(os.path.join(wifi_module_path, 'output.finished')), \
                 "No output finished in {}".format(wifi_module_path)
