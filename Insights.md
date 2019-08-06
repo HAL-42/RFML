@@ -64,3 +64,9 @@ Read Batch Cost 4.979849338531494s
 
 ***
 
+## Data Processing Speed
+
+![Disk R&R VS Compute](D:\Win\Doc\#Project\RFML\doc\Disk R&R VS Compute.png)
+
+Most of processing time was cost on reading csv and writing txt.
+
