@@ -35,7 +35,7 @@ class Logger(object):
         'crit':logging.CRITICAL
     }#日志级别关系映射
 
-    def __init__(self,filename=None,level='info',when=None,backCount=3,fmt='%(asctime)s - %(name)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'):
+    def __init__(self,filename=None,level='debug',when=None,backCount=3,fmt='%(asctime)s - %(name)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'):
         if not filename:
             self.logger = logging.getLogger('sh_logger')
         else:

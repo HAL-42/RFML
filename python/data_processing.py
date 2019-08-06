@@ -64,8 +64,8 @@ def TrunkQuiteTo10k(data: np.ndarray) -> Union[np.ndarray, int]:
                 break
         start_point = i * kNStep + kNStep
 
-        print("Start Point is at", start_point)
-        print("Threshold =", threshold)
+        sh_logger.info("Start Point is at {}".format(start_point))
+        sh_logger.info("Threshold = {}".format(threshold))
         if kIsDebug:
             plt.plot(np.array(st_energy))
             plt.show()
@@ -80,7 +80,7 @@ def TrunkQuiteTo10k(data: np.ndarray) -> Union[np.ndarray, int]:
 def Get10kIQFromCSV(csv_path: str) -> Optional[tuple]:
     read_start_time = time.time()
     str_data_with_header = np.loadtxt(csv_path, dtype=str)
-    sh_logger.info("Reading CSV cost {}s".format(time.time() - read_start_time))
+    sh_logger.debug("Reading CSV cost {}s".format(time.time() - read_start_time))
 
     str_data = str_data_with_header[kCSVHeaderLen:]
     I = []
@@ -96,7 +96,7 @@ def Get10kIQFromCSV(csv_path: str) -> Optional[tuple]:
     compute_start_time = time.time()
     trunked_I = TrunkQuiteTo10k(I)
     trunked_Q = TrunkQuiteTo10k(Q)
-    sh_logger.info("Compute Current CSV Cost {}s".format(time.time() - compute_start_time))
+    sh_logger.debug("Compute Current CSV Cost {}s".format(time.time() - compute_start_time))
 
     if kIsDebug:
         plt.subplot(2, 1, 1)
@@ -150,8 +150,9 @@ def DataProcess():
             for csv_path in glob.glob(os.path.join(wifi_module_path, '*.csv')):
                 csv_name = (os.path.split(csv_path)[1])[
                     :-4]  # Get csv name without '.csv'
-                print('Processing CSV', csv_name,
-                      'from wifi module', wifi_module_name)
+                sh_logger.info("------------------------------")
+                sh_logger.info('Processing CSV ' + csv_name +
+                      ' from wifi module ' + wifi_module_name)
 
                 if kIsTiming:
                     start_csv_time = time.time()  # Time for processing one csv file
@@ -169,14 +170,14 @@ def DataProcess():
 
                     write_start_time = time.time()
                     SaveIQ(I_path, I, Q_path, Q)
-                    sh_logger.info("Writing txt cost {}s".format(time.time() - write_start_time))
+                    sh_logger.debug("Writing txt cost {}s".format(time.time() - write_start_time))
 
                 # Timing
                 if kIsTiming:
-                    print("Processing Current CSV cost", str(
+                    sh_logger.debug("Processing Current CSV cost " + str(
                         time.time() - start_csv_time) + 's')
             if kIsTiming:
-                print("Processing Current module cost", str(
+                sh_logger.debug("Processing Current module cost " + str(
                     time.time() - start_folder_time) + 's')
             # Label Current Wifi module as Finished
             os.rename(os.path.join(wifi_module_path, 'output'),
