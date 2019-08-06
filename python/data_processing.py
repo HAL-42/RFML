@@ -78,7 +78,10 @@ def TrunkQuiteTo10k(data: np.ndarray) -> Union[np.ndarray, int]:
 
 
 def Get10kIQFromCSV(csv_path: str) -> Optional[tuple]:
+    read_start_time = time.time()
     str_data_with_header = np.loadtxt(csv_path, dtype=str)
+    sh_logger.info("Reading CSV cost {}s".format(time.time() - read_start_time))
+
     str_data = str_data_with_header[kCSVHeaderLen:]
     I = []
     Q = []
@@ -89,8 +92,12 @@ def Get10kIQFromCSV(csv_path: str) -> Optional[tuple]:
         Q.append(float(str_Q))
     I = np.array(I, dtype=np.float32)
     Q = np.array(Q, dtype=np.float32)
+
+    compute_start_time = time.time()
     trunked_I = TrunkQuiteTo10k(I)
     trunked_Q = TrunkQuiteTo10k(Q)
+    sh_logger.info("Compute Current CSV Cost {}s".format(time.time() - compute_start_time))
+
     if kIsDebug:
         plt.subplot(2, 1, 1)
         plt.plot(I)
@@ -118,8 +125,8 @@ def SaveIQ(I_path: str, I: Union[np.ndarray, int], Q_path, Q: Union[np.ndarray, 
             err_f.write("{csv_name}'s I Start Point is at {I}, Q Start Point is at {Q}.\n"
                         .format(csv_name=csv_name, I=I, Q=Q))
     else:
-        np.savetxt(I_path, I)
-        np.savetxt(Q_path, Q)
+        np.savetxt(I_path, I, fmt='%.6e')
+        np.savetxt(Q_path, Q, fmt='%.6e')
     return 0
 
 
@@ -159,7 +166,11 @@ def DataProcess():
                 else:
                     # Get Trunked and normalized IQ, save as txt
                     I, Q = Get10kIQFromCSV(csv_path)
+
+                    write_start_time = time.time()
                     SaveIQ(I_path, I, Q_path, Q)
+                    sh_logger.info("Writing txt cost {}s".format(time.time() - write_start_time))
+
                 # Timing
                 if kIsTiming:
                     print("Processing Current CSV cost", str(
