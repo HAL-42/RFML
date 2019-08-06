@@ -107,9 +107,10 @@ class MultiClassificationTester(object):
         ax.set_ylabel('Ground Truth')
 
         # 显示图形
+        fig = plt.gcf()
         plt.show()
         if img_save_path:
-            plt.savefig(img_save_path)
+            fig.savefig(img_save_path)
         print("********Confusion Matric********")
         print(self.pd_confusion_matrix)
 
