@@ -15,7 +15,7 @@ from logging import handlers
 import sys
 import os
 sys.path.append(os.path.join('.', 'my_py_tools'))
-import my_py_tools.colorlog as cl
+import colorlog as cl
 
 log_colors_config = {
     'DEBUG': 'cyan',
