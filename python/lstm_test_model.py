@@ -11,11 +11,10 @@
 import os
 import numpy as np
 import tensorflow as tf
-from lstm_model.build_model import BuildModel
 from lstm_model.data_manager import DataManager
 from my_py_tools.my_logger import Logger, sh_logger
 from my_py_tools.my_process_bar import ProcessBar
-import time
+from lstm_model.multi_classification_testor import MultiClassificationTester
 
 kBatchSize = 1024
 kLoadModelNum = 11
@@ -25,6 +24,7 @@ kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
 kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
 kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
 kSnapshotPath = os.path.join(kLogPath, 'snapshot', 'LSTM')
+kTestResultPath = os.path.join(kLogPath, 'final_test_result')
 
 if __name__ == '__main__':
     # ! Init saver, sess, and data manager
@@ -45,11 +45,19 @@ if __name__ == '__main__':
 
         batch_num = int(np.ceil(data_manager.test_samples_num / kBatchSize))
         process_bar = ProcessBar(batch_num)
+        tester = MultiClassificationTester(data_manager.classes_list)
         for i, test_batch in enumerate(test_batches):
             batch_X, batch_Y = test_batch
+            batch_X = batch_X.reshape((batch_X.shape[0], input_X.shape[1], input_X.shape[2]))
             batch_probability = sess.run(softmax_output, feed_dict={input_X: batch_X})
 
-            process_bar.SkipMsg(str(batch_probability[0:5, :]), sh_logger)
-            process_bar.SkipMsg(str(batch_Y[0:5, :]), sh_logger)
+            tester.update_confusion_matrix(batch_probability, batch_Y)
+            tester.show_confusion_matrix()
 
             process_bar.UpdateBar(i + 1)
+        # ! Show test result
+        if not os.path.isdir(kTestResultPath):
+            os.makedirs(kTestResultPath)
+        tester.show_confusion_matrix(img_save_path=os.path.join(kTestResultPath, "confusion_matrix.png"))
+        tester.measure()
+        tester.show_measure_result(rslt_save_path=os.path.join(kTestResultPath, "test_result.txt"))
