@@ -7,11 +7,12 @@ from my_py_tools.my_logger import Logger
 from my_py_tools.my_process_bar import ProcessBar
 import time
 
-kBatchSize = 1024
-kLearningRate = 0.001
-kNumEpochs = 100
+kBatchSize = 2048
+kLearningRate = 0.0012
+kNumEpochs = 25
+kSnapshotMaxToKeep = 15
 
-kH5DataPath = os.path.join('..', 'data', 'h5data.same_mac')
+kH5DataPath = os.path.join('..', 'data', 'h5data.same_module_diff_mac')
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
 kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
 kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
@@ -23,7 +24,7 @@ if __name__ == '__main__':
 	data_manager = DataManager(kH5TrainTestDataPath, kH5ModuleDataPath, I_only=True, down_sample=0)
 
 	# build model
-	lstm_model = BuildModel(data_manager.classes_num)
+	lstm_model = BuildModel(data_manager.classes_num, num_hidden=2048)
 	lstm_model.build()
 
 	loss = lstm_model.loss()
@@ -40,7 +41,7 @@ if __name__ == '__main__':
 	iteration = 0
 	init = tf.global_variables_initializer()
 
-	saver = tf.train.Saver(max_to_keep=5)
+	saver = tf.train.Saver(max_to_keep=kSnapshotMaxToKeep)
 	logger = Logger(os.path.join(kLogPath, 'lstm_train_val.log')).logger
 	with tf.Session() as sess:
 		# writer

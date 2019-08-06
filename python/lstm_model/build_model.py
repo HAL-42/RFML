@@ -1,13 +1,13 @@
 import tensorflow as tf
 
 class BuildModel():
-	TOTAL_SAMPLE_LENGTH = 10000
-	TIMESTEPS = 50
-	NUM_INPUT = int(TOTAL_SAMPLE_LENGTH / TIMESTEPS)
-	NUM_HIDDEN = 1024
-
-	def __init__(self, num_classes):
+	def __init__(self, num_classes, total_sample_length=10000, time_steps=50, num_hidden=1024):
 		self.num_classes = num_classes
+
+		self.TOTAL_SAMPLE_LENGTH = total_sample_length
+		self.TIMESTEPS = time_steps
+		self.NUM_INPUT = int(self.TOTAL_SAMPLE_LENGTH / self.TIMESTEPS)
+		self.NUM_HIDDEN = num_hidden
 
 		self._create_tensors()
 
