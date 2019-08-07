@@ -92,7 +92,7 @@ class MultiClassificationTester(object):
 
     def show_confusion_matrix(self, img_save_path: Optional[str]=None):
         ax = sns.heatmap(self.pd_confusion_matrix,  # 指定绘图数据
-                         # cmap=plt.cm.Blues,  # 指定填充色
+                         cmap=plt.cm.Blues,  # 指定填充色
                          linewidths=.1,  # 设置每个单元方块的间隔
                          annot=True  # 显示数值
                          )
