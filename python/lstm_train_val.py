@@ -9,7 +9,7 @@ import time
 
 kBatchSize = 2048
 kLearningRate = 0.0012
-kNumEpochs = 25
+kNumEpochs = 35
 kSnapshotMaxToKeep = 15
 
 kH5DataPath = os.path.join('..', 'data', 'h5data.same_module_diff_mac')
@@ -18,10 +18,15 @@ kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
 kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
 kSnapshotPath = os.path.join(kLogPath, 'snapshot', 'LSTM')
 
+kIsRecover = False
+kRecoverEpochNum = 24
+kRecoverMetaFile = kSnapshotPath + '-{}.meta'.format(kRecoverEpochNum)
+kRecoverDataFile = kSnapshotPath + '-{}'.format(kRecoverEpochNum)
 
 if __name__ == '__main__':
-	# parse
+	# data and log manager
 	data_manager = DataManager(kH5TrainTestDataPath, kH5ModuleDataPath, I_only=True, down_sample=0)
+	logger = Logger(os.path.join(kLogPath, 'lstm_train_val.log')).logger
 
 	# build model
 	lstm_model = BuildModel(data_manager.classes_num, num_hidden=2048)
@@ -38,19 +43,22 @@ if __name__ == '__main__':
 	merged = tf.summary.merge_all()
 
 	# init
-	iteration = 0
 	init = tf.global_variables_initializer()
 
 	saver = tf.train.Saver(max_to_keep=kSnapshotMaxToKeep)
-	logger = Logger(os.path.join(kLogPath, 'lstm_train_val.log')).logger
 	with tf.Session() as sess:
 		# writer
 		train_writer = tf.summary.FileWriter(os.path.join(kLogPath, 'lstm_train'), sess.graph)
 		test_writer = tf.summary.FileWriter(os.path.join(kLogPath, 'lstm_test'), sess.graph)
 
 		# Run the initializer
-		sess.run(init)
-		saver.save(sess, kSnapshotPath)
+		if not kIsRecover:
+			sess.run(init)
+			saver.save(sess, kSnapshotPath)
+		else:
+			saver.restore(sess, kRecoverDataFile)
+		# ! Start training
+		iteration = 0
 		for epoch in range(kNumEpochs):
 			epoch_start_time = time.time()
 			logger.info('****** Epoch: {}/{} ******'.format(epoch, kNumEpochs))
@@ -69,22 +77,31 @@ if __name__ == '__main__':
 				batch_X = batch_X.reshape(batch_X.shape[0], lstm_model.TIMESTEPS, -1)
 
 				if iteration % 5 == 0:
-					train_summary, current_loss, current_accuracy = sess.run([merged, loss, accuracy], feed_dict={lstm_model.X: batch_X, lstm_model.Y: batch_Y})
+					_, train_summary, current_loss = \
+						sess.run([optimizer, merged, loss], feed_dict={lstm_model.X: batch_X, lstm_model.Y: batch_Y})
 					train_writer.add_summary(train_summary, iteration)
-					process_bar.SkipMsg('({}/{}) loss: {}, accuracy: {}'.format(i, batches_num, current_loss, current_accuracy)
-										, logger)
 
 					test_X, test_Y = data_manager.get_random_test_samples(kBatchSize)
 					test_X = test_X.reshape(test_X.shape[0],  lstm_model.TIMESTEPS, -1)
-					test_summary = sess.run(merged, feed_dict={lstm_model.X: test_X, lstm_model.Y: test_Y})
+					test_summary, current_accuracy = \
+						sess.run([merged, accuracy], feed_dict={lstm_model.X: test_X, lstm_model.Y: test_Y})
 					test_writer.add_summary(test_summary, iteration)
 
-				_ = sess.run([optimizer], feed_dict={lstm_model.X: batch_X, lstm_model.Y: batch_Y})
+					process_bar.SkipMsg(
+						'({}/{}) loss: {}, accuracy: {}'.format(i, batches_num, current_loss, current_accuracy)
+						, logger)
+				else:
+					_ = sess.run([optimizer], feed_dict={lstm_model.X: batch_X, lstm_model.Y: batch_Y})
 
 				iteration += 1
 				process_bar.UpdateBar(i + 1)
 			process_bar.Close()
-			saver.save(sess, kSnapshotPath, global_step=epoch)
+			# ! Save model for this epoch
+			if kIsRecover:
+				saver.save(sess, kSnapshotPath, global_step=epoch + kRecoverEpochNum + 1)
+			else:
+				saver.save(sess, kSnapshotPath, global_step=epoch)
+
 			logger.info("It Cost {}s to finish this epoch".format(time.time() - epoch_start_time))
 		train_writer.close()
 		test_writer.close()
