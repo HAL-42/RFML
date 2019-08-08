@@ -23,7 +23,7 @@ class MultiClassificationTester(object):
         self.classes_num = len(classes_list)
         # ! confusion matrix attr
         self.confusion_matrix = np.zeros((self.classes_num, self.classes_num), dtype=np.int)
-        self.pd_confusion_matrix = pd.DataFrame(data=self.confusion_matrix,
+        self.pd_confusion_matrix = pd.DataFrame(data=np.zeros((self.classes_num, self.classes_num), dtype=np.int),
                                                 index=classes_list, columns=classes_list)
         # ! attr need measured
         self.classes_gt_num = np.zeros(self.classes_num, dtype=np.int)
