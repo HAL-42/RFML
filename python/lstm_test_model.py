@@ -23,9 +23,9 @@ matplotlib.use('Qt5Agg')
 
 # ! Manual Setting Const
 kIsCompletelyTest = True
-kIsErrorInspect = True
+kIsErrorInspect = False
 
-kBatchSize = 2048
+kBatchSize = 1024
 kLoadModelNum = 11
 
 kH5DataPath = os.path.join('..', 'data', 'h5data.same_mac')
@@ -76,6 +76,7 @@ def ErrorInspect(data_manager, sess, tester):
         # ! Get a test batch then show test result
         tester.restart()
         batch_X, batch_Y = data_manager.get_random_test_samples(kBatchSize)
+        batch_X = batch_X.reshape((batch_X.shape[0], input_X.shape[1], input_X.shape[2]))
         batch_probability = sess.run(softmax_output, feed_dict={input_X: batch_X})
         tester.update_confusion_matrix(batch_probability, batch_Y)
         tester.show_confusion_matrix()
