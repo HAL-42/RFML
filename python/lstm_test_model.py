@@ -16,10 +16,10 @@ from my_py_tools.my_logger import Logger, sh_logger
 from my_py_tools.my_process_bar import ProcessBar
 from lstm_model.multi_classification_testor import MultiClassificationTester
 
-kBatchSize = 2048
-kLoadModelNum = 34
+kBatchSize = 1024
+kLoadModelNum = 11
 
-kH5DataPath = os.path.join('..', 'data', 'h5data.same_module_diff_mac')
+kH5DataPath = os.path.join('..', 'data', 'h5data.same_mac')
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
 kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
 kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
