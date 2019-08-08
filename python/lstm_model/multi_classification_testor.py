@@ -53,7 +53,6 @@ class MultiClassificationTester(object):
 
     def restart(self):
         self.confusion_matrix[...] = 0
-        self.pd_confusion_matrix[...] = 0
         for row in range(self.classes_num):
             for col in range(self.classes_num):
                 self.confusion_list_matrix[row, col] = list()
@@ -65,7 +64,6 @@ class MultiClassificationTester(object):
 
         for i in range(samples_predict.shape[0]):
             self.confusion_matrix[samples_gt[i], samples_predict[i]] += 1
-            self.pd_confusion_matrix.iloc[samples_gt[i], samples_predict[i]] += 1
             self.confusion_list_matrix[samples_gt[i], samples_predict[i]].append(i)
         self._is_measured = False
 
