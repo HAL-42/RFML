@@ -7,19 +7,23 @@ from my_py_tools.my_logger import Logger
 from my_py_tools.my_process_bar import ProcessBar
 import time
 
+# ! Manual Setting
 kBatchSize = 2048
-kLearningRate = 0.0012
-kNumEpochs = 35
+kLearningRate = 0.001
+kNumEpochs = 40
 kSnapshotMaxToKeep = 15
+kHiddenStateNum = 1024
 
-kH5DataPath = os.path.join('..', 'data', 'h5data.same_module_diff_mac')
-kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
-kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
+kH5DataPath = os.path.join('..', 'data', 'h5data.diff_module_same_mac_43')
 kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
-kSnapshotPath = os.path.join(kLogPath, 'snapshot', 'LSTM')
 
 kIsRecover = False
 kRecoverEpochNum = 24
+# ! Automatic Generated
+kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
+kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
+kSnapshotPath = os.path.join(kLogPath, 'snapshot', 'LSTM')
+
 kRecoverMetaFile = kSnapshotPath + '-{}.meta'.format(kRecoverEpochNum)
 kRecoverDataFile = kSnapshotPath + '-{}'.format(kRecoverEpochNum)
 
@@ -29,7 +33,7 @@ if __name__ == '__main__':
 	logger = Logger(os.path.join(kLogPath, 'lstm_train_val.log')).logger
 
 	# build model
-	lstm_model = BuildModel(data_manager.classes_num, num_hidden=2048)
+	lstm_model = BuildModel(data_manager.classes_num, num_hidden=kHiddenStateNum)
 	lstm_model.build()
 
 	loss = lstm_model.loss()
