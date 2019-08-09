@@ -17,15 +17,11 @@ from my_py_tools.my_process_bar import ProcessBar
 from lstm_model.multi_classification_testor import MultiClassificationTester
 from matplotlib import pyplot as plt
 
-import matplotlib
-matplotlib.use('Qt5Agg')
-
-
 # ! Manual Setting Const
-kIsCompletelyTest = True
-kIsErrorInspect = False
+kIsCompletelyTest = False
+kIsErrorInspect = True
 
-kBatchSize = 1024
+kBatchSize = 2048
 kLoadModelNum = 11
 
 kH5DataPath = os.path.join('..', 'data', 'h5data.same_mac')
@@ -42,20 +38,21 @@ def PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list):
     error_waves_num = len(error_waves_list)
 
     plt.figure()
-    # ! Plot Reference Wave
-    plt.subplot(2 + error_waves_num, 2, 1)
+    # ! Plot Ground Truth Reference Wave
+    plt.subplot(2 + error_waves_num, 1, 1)
     plt.title('Ground Truth Class Wave')
     plt.plot(gt_class_wave)
-
-    plt.subplot(2 + error_waves_list, 2, 2)
-    plt.title('Predict Class Wave')
-    plt.plot(predict_class_wave)
     # ! Plot Error Waves
     for i, error_wave in enumerate(error_waves_list):
-        plt.subplot(2 + error_waves_list, 1, i + 2)
+        plt.subplot(2 + error_waves_num, 1, i + 2)
         plt.title('Error Wave {}'.format(i))
         plt.plot(error_wave)
+    # ! Plot Predict Reference Wave
+    plt.subplot(2 + error_waves_num, 1, 2 + error_waves_num)
+    plt.title('Predict Class Wave')
+    plt.plot(predict_class_wave)
 
+    plt.show()
 
 def RandomSelectWaves(gt_class, predict_class, tester, batch_X, max_to_select=1):
     # ! Get waves' index list
@@ -64,7 +61,9 @@ def RandomSelectWaves(gt_class, predict_class, tester, batch_X, max_to_select=1)
     indexes = tester.confusion_list_matrix[row, col]
     # ! Random select indexes
     select_num = min(len(indexes), max_to_select)
-    selected_indexes = np.random.choise(indexes, select_num, replace=False)
+    selected_indexes = np.random.choice(indexes, select_num, replace=False)
+
+    batch_X = batch_X.reshape(batch_X.shape[0], -1)
     return list(batch_X[selected_indexes, :])
 
 def ErrorInspect(data_manager, sess, tester):
@@ -81,8 +80,7 @@ def ErrorInspect(data_manager, sess, tester):
         tester.update_confusion_matrix(batch_probability, batch_Y)
         tester.show_confusion_matrix()
         # ! Decide whether use this test result
-        print("Start Inspection input i; Retest input others")
-        usr_select = input()
+        usr_select = input("Start Inspection input i; Retest input others: ")
         if usr_select != 'i':
             continue
         else:
@@ -90,32 +88,32 @@ def ErrorInspect(data_manager, sess, tester):
             while True:
                 # ! Read in gt and predict class name
                 while True:
-                    print("Input gt class name")
-                    gt_class = input()
-                    print("Input predict class name")
-                    predict_class = input()
+                    gt_class = input("Input gt class name: ")
+                    predict_class = input("Input predict class name: ")
                     if gt_class not in data_manager.classes_list or predict_class not in data_manager.classes_list:
-                        print("\033[1;31 Error: Input class name is not in class list, please input again")
+                        print("\033[1;31mError: Input class name is not in class list, please input again \033[0m")
                     else:
                         break
                 if gt_class == predict_class:
-                    print("\033[0;33 Warning: gt class is equal to predict class, no error wave will "
-                          "be shown")
+                    print("\033[0;33mWarning: gt class is equal to predict class, no error wave will "
+                          "be shown \033[0m")
                 # ! Start select waves and plot
+                error_waves_select_num = 3
                 while True:
                     gt_class_wave = RandomSelectWaves(gt_class, gt_class,
                                                       tester, batch_X)[0]
                     predict_class_wave = RandomSelectWaves(predict_class, predict_class,
                                                            tester, batch_X)[0]
                     error_waves_list = RandomSelectWaves(gt_class, predict_class,
-                                                         tester, batch_X, 2)
+                                                         tester, batch_X, error_waves_select_num)
                     PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list)
                     # ! Interact Part
-                    print("Quick replot input any key; Reselect classes input r; Retest input"
-                          "t; Exit input e")
-                    usr_select = input()
-                    if usr_select != 'r' or usr_select != 't' or usr_select != 'e':
-                        continue
+                    usr_select = input("Quick replot input any key; Reselect classes input r; Retest input"
+                          "t; Reset Error Waves Num input n; Exit input e: ")
+                    if usr_select != 'r' and usr_select != 't' and usr_select != 'e' and usr_select != 'n':
+                        pass
+                    elif usr_select == 'n':
+                        error_waves_select_num = int(input("Input Error Waves Num: "))
                     else:
                         break
                 if usr_select == 'r':
