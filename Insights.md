@@ -97,7 +97,7 @@ Under normal circumstance, difference of this three indexes are minor.
 ***
 ## Result of  Diff Module Same Mac on Mini5
 
-![](D:\Win\Doc\#Project\RFML\doc\diff_module_same_mac_mini5_final_test_result.png)
+![](.\doc\diff_module_same_mac_mini5_final_test_result.png)
 
 Classes' Macro F1 Score
 0.9807583625073948
@@ -130,15 +130,15 @@ How ever, in 43 module date set, the distribution range won't change, so each mo
 
 Still Bad. We use 2048 hidden state, the train accuracy went up to 97%+
 
-![same_module_diff_mac_mini5_train_accuracy](D:\Win\Doc\#Project\RFML\doc\same_module_diff_mac_mini5_train_accuracy.png)
+![same_module_diff_mac_mini5_train_accuracy](.\doc\same_module_diff_mac_mini5_train_accuracy.png)
 
-![same_module_diff_mac_mini5_train_loss](D:\Win\Doc\#Project\RFML\doc\same_module_diff_mac_mini5_train_loss.png)
+![same_module_diff_mac_mini5_train_loss](.\doc\same_module_diff_mac_mini5_train_loss.png)
 
 However, it's overfitting:
 
-![same_module_diff_mac_mini5_test_accuracy](D:\Win\Doc\#Project\RFML\doc\same_module_diff_mac_mini5_test_accuracy.png)
+![same_module_diff_mac_mini5_test_accuracy](.\doc\same_module_diff_mac_mini5_test_accuracy.png)
 
-![same_module_diff_mac_mini5_test_loss](D:\Win\Doc\#Project\RFML\doc\same_module_diff_mac_mini5_test_loss.png)
+![same_module_diff_mac_mini5_test_loss](.\doc\same_module_diff_mac_mini5_test_loss.png)
 
 Classes' Recall
 [0.59552296 0.58317252 0.61945195 0.68853724 0.57661135]
@@ -160,4 +160,63 @@ Classes' Macro Precision
 Classes' Micro Precision
 0.6126592049401776
 
-![confusion_matrix](D:\Win\Doc\#Project\RFML\python\log\tf.h5data.same_module_diff_mac.LSTM.log\final_test_result\confusion_matrix.png)
+![confusion_matrix](.\python\log\tf.h5data.same_module_diff_mac.LSTM.log\final_test_result\confusion_matrix.png)
+
+
+
+***
+
+## Quite Tail Problem
+
+### The problem
+
+At the beginning of this project, we are told that the signal we received should be composed with an quite head following beacon signal.
+
+![60k wave](.\doc\60k_old_sample_wave.jpg)
+
+It seems the dataset with 60k samples of the last paper did following this formula: quite head + beacon signal.
+
+Also, I remember the data I get at the beginning of this project with 11k samples also have a quite head because I have written a program to plot the data before and after trunked, and it looked fine.
+
+But now, I look to the date set we have, most of date don't have an quite head, some of them have an quite tail.
+
+So, at some time point, the data we collected become the waveform shown below: no quite head, some have a quite tail:
+
+![B_ref](D:\Win\Doc\#Project\RFML\doc\diff_module_same_mac_inspect\B_ref.png)
+
+### Several Hypothesis
+
+The principle of data collection is the receiver triggered by the rising edge of input whose threshold is -35dbm.
+
+If the beacon frame signal magnitude never go less than -35dbm, then the receiver will only be triggered at the beginning of the beacon frame, which will generate a wave with quite head.
+
+Now it seems the receiver is untriggered and retriggered during the beacon frame, so most of raw data don't have a quite head, some have a quite tail.
+
+* We change the trigger threshold some time
+* ...
+
+### Influence of this "quite tail"
+
+Samples with quite tail are easily be wrongly classified.
+
+The model we trained has learn how to ignore the quite tail and focus on the signal part, so most of samples with quite tail can still be rightly classified.
+
+* However, the wrong classifications between two module whose frequency shift is large are almost completely caused by these quite tail signal:
+
+![gt_A_pre_G](D:\Win\Doc\#Project\RFML\doc\diff_module_same_mac_inspect\gt_A_pre_G.png)
+
+![gt_G_pre_F](D:\Win\Doc\#Project\RFML\doc\diff_module_same_mac_inspect\gt_G_pre_F.png)
+
+* The wrong classifications between two module whose frequency shift is close are partly caused by these quite tail signal:
+
+  ![gt_B_pre_F](doc/diff_module_same_mac_inspect/gt_B_pre_F.png)
+
+### Remedy
+
+Write a program to kick out the wave:
+
+* Mean power is tow low(for long quite tail signal)
+
+* Power difference between first and last quarter is too large.
+
+We can add this program to training and testing. Or create an new clean dataset.

@@ -25,6 +25,10 @@ class MultiClassificationTester(object):
         self.confusion_matrix = np.zeros((self.classes_num, self.classes_num), dtype=np.int)
         self.pd_confusion_matrix = pd.DataFrame(data=np.zeros((self.classes_num, self.classes_num), dtype=np.int),
                                                 index=classes_list, columns=classes_list)
+        self.confusion_list_matrix = np.empty((self.classes_num, self.classes_num), dtype=np.object)
+        for row in range(self.classes_num):
+            for col in range(self.classes_num):
+                self.confusion_list_matrix[row, col] = list()
         # ! attr need measured
         self.classes_gt_num = np.zeros(self.classes_num, dtype=np.int)
         self.classes_predict_num = np.zeros(self.classes_num, dtype=np.int)
@@ -49,7 +53,9 @@ class MultiClassificationTester(object):
 
     def restart(self):
         self.confusion_matrix[...] = 0
-        self.pd_confusion_matrix[...] = 0
+        for row in range(self.classes_num):
+            for col in range(self.classes_num):
+                self.confusion_list_matrix[row, col] = list()
         self._is_measured = False
 
     def update_confusion_matrix(self, samples_predict_vec: np.ndarray, samples_gt_vec: np.ndarray):
@@ -58,7 +64,7 @@ class MultiClassificationTester(object):
 
         for i in range(samples_predict.shape[0]):
             self.confusion_matrix[samples_gt[i], samples_predict[i]] += 1
-            self.pd_confusion_matrix.iloc[samples_gt[i], samples_predict[i]] += 1
+            self.confusion_list_matrix[samples_gt[i], samples_predict[i]].append(i)
         self._is_measured = False
 
     def measure(self, weighted_macro_avg: bool = False, probability_weight: Optional[np.ndarray]=None):
