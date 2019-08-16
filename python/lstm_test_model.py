@@ -16,9 +16,10 @@ from my_py_tools.my_logger import Logger, sh_logger
 from my_py_tools.my_process_bar import ProcessBar
 from lstm_model.multi_classification_testor import MultiClassificationTester
 from matplotlib import pyplot as plt
+from data_process_patch import BatchCleaner
 
 # ! Manual Setting Const
-kIsCompletelyTest = True
+kIsCompletelyTest = False
 kIsErrorInspect = True
 
 kBatchSize = 2048
@@ -26,6 +27,8 @@ kLoadModelNum = 14
 
 kH5DataPath = os.path.join('..', 'data', 'h5data.diff_module_same_mac_43')
 kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
+
+kHotClean = True
 
 # ! Automatic Generated Const
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
@@ -54,17 +57,22 @@ def PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list):
 
     plt.show()
 
+
 def RandomSelectWaves(gt_class, predict_class, tester, batch_X, max_to_select=1):
     # ! Get waves' index list
     row = tester.classes_list.index(gt_class)
     col = tester.classes_list.index(predict_class)
     indexes = tester.confusion_list_matrix[row, col]
     # ! Random select indexes
-    select_num = min(len(indexes), max_to_select)
-    selected_indexes = np.random.choice(indexes, select_num, replace=False)
+    if len(indexes) == 0:
+        return []
+    else:
+        select_num = min(len(indexes), max_to_select)
+        selected_indexes = np.random.choice(indexes, select_num, replace=False)
 
-    batch_X = batch_X.reshape(batch_X.shape[0], -1)
-    return list(batch_X[selected_indexes, :])
+        batch_X = batch_X.reshape(batch_X.shape[0], -1)
+        return list(batch_X[selected_indexes, :])
+
 
 def ErrorInspect(data_manager, sess, tester):
     # ! Get tensor X and Softmax probability
@@ -75,6 +83,8 @@ def ErrorInspect(data_manager, sess, tester):
         # ! Get a test batch then show test result
         tester.restart()
         batch_X, batch_Y = data_manager.get_random_test_samples(kBatchSize)
+        if kHotClean:
+            batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
         batch_X = batch_X.reshape((batch_X.shape[0], input_X.shape[1], input_X.shape[2]))
         batch_probability = sess.run(softmax_output, feed_dict={input_X: batch_X})
         tester.update_confusion_matrix(batch_probability, batch_Y)
@@ -125,6 +135,7 @@ def ErrorInspect(data_manager, sess, tester):
             else:
                 break
 
+
 def CompletelyTest(data_manager, graph, sess, tester):
     tester.restart()
     # ! Get tensor X and Softmax probability
@@ -137,6 +148,8 @@ def CompletelyTest(data_manager, graph, sess, tester):
     process_bar = ProcessBar(batch_num)
     for i, test_batch in enumerate(test_batches):
         batch_X, batch_Y = test_batch
+        if kHotClean:
+            batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
         batch_X = batch_X.reshape((batch_X.shape[0], input_X.shape[1], input_X.shape[2]))
         batch_probability = sess.run(softmax_output, feed_dict={input_X: batch_X})
 

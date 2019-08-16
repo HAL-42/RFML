@@ -23,7 +23,7 @@ class MultiClassificationTester(object):
         self.classes_num = len(classes_list)
         # ! confusion matrix attr
         self.confusion_matrix = np.zeros((self.classes_num, self.classes_num), dtype=np.int)
-        self.pd_confusion_matrix = pd.DataFrame(data=np.zeros((self.classes_num, self.classes_num), dtype=np.int),
+        self.pd_confusion_matrix = pd.DataFrame(data=self.confusion_matrix,
                                                 index=classes_list, columns=classes_list)
         self.confusion_list_matrix = np.empty((self.classes_num, self.classes_num), dtype=np.object)
         for row in range(self.classes_num):
@@ -113,6 +113,7 @@ class MultiClassificationTester(object):
         ax.set_ylabel('Ground Truth')
 
         # 显示图形
+        plt.figure(figsize=(24, 24), dpi=400)
         fig = plt.gcf()
         plt.show()
         if img_save_path:
