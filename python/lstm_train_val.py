@@ -9,13 +9,13 @@ import time
 
 # ! Manual Setting
 kBatchSize = 2048
-kLearningRate = 0.001
+kLearningRate = 0.0012
 kNumEpochs = 40
-kSnapshotMaxToKeep = 15
-kHiddenStateNum = 1024
+kSnapshotMaxToKeep = 20
+kHiddenStateNum = 2048
 
 kH5DataPath = os.path.join('..', 'data', 'h5data.diff_module_same_mac_43')
-kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
+kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.2048hs' +'.LSTM.log')
 
 kIsRecover = False
 kRecoverEpochNum = 24
