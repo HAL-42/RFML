@@ -19,16 +19,16 @@ from matplotlib import pyplot as plt
 from data_process_patch import BatchCleaner
 
 # ! Manual Setting Const
-kIsCompletelyTest = False
+kIsCompletelyTest = True
 kIsErrorInspect = True
 
 kBatchSize = 2048
-kLoadModelNum = 14
+kLoadModelNum = 35
 
 kH5DataPath = os.path.join('..', 'data', 'h5data.diff_module_same_mac_43')
-kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
+kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.2048hs.LSTM.log')
 
-kHotClean = True
+kHotClean = False
 
 # ! Automatic Generated Const
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
