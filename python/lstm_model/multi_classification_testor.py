@@ -113,7 +113,7 @@ class MultiClassificationTester(object):
         ax.set_ylabel('Ground Truth')
 
         # 显示图形
-        plt.figure(figsize=(24, 24), dpi=400)
+        plt.figure()
         fig = plt.gcf()
         plt.show()
         if img_save_path:
