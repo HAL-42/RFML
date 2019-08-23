@@ -22,10 +22,11 @@ kTailInHeadThreshold = 0.8
 kSampleInBatchMeanThreshold = 0.35
 kHeadTailPercentage = 0.4
 
-kIsDebug = True
+kIsDebug = False
 kMaxToKeepWaves = 8
 
-kH5DataDir = os.path.join('..', 'data', 'h5data.diff_module_same_mac_mini5')
+# kH5DataDir = os.path.join('..', 'data', 'h5data.diff_module_same_mac_mini5')
+kH5DataDir = "F:\\h5data.diff_module_same_mac_43"
 kLogFile = os.path.join('.', 'log')
 
 kIsChar2Num = True

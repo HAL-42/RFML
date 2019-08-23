@@ -9,15 +9,15 @@ import time
 
 # ! Manual Setting
 kBatchSize = 2048
-kLearningRate = 0.0012
-kNumEpochs = 40
+kLearningRate = 0.001
+kNumEpochs = 50
 kSnapshotMaxToKeep = 20
-kHiddenStateNum = 2048
+kHiddenStateNum = 1024
 
-kH5DataPath = os.path.join('..', 'data', 'h5data.diff_module_same_mac_43')
-kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.2048hs' +'.LSTM.log')
+kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
+kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] +'.LSTM.log')
 
-kIsRecover = False
+kIsRecover = True
 kRecoverEpochNum = 24
 # ! Automatic Generated
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
@@ -63,7 +63,12 @@ if __name__ == '__main__':
 			saver.restore(sess, kRecoverDataFile)
 		# ! Start training
 		iteration = 0
-		for epoch in range(kNumEpochs):
+		# ! If recover training, start at recover epoch
+		if kIsRecover:
+			start_epoch = kRecoverEpochNum + 1
+		else:
+			start_epoch = 0
+		for epoch in range(start_epoch, kNumEpochs):
 			epoch_start_time = time.time()
 			logger.info('****** Epoch: {}/{} ******'.format(epoch, kNumEpochs))
 
@@ -105,7 +110,6 @@ if __name__ == '__main__':
 				saver.save(sess, kSnapshotPath, global_step=epoch + kRecoverEpochNum + 1)
 			else:
 				saver.save(sess, kSnapshotPath, global_step=epoch)
-
 			logger.info("It Cost {}s to finish this epoch".format(time.time() - epoch_start_time))
 		train_writer.close()
 		test_writer.close()

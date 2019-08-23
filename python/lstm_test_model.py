@@ -23,10 +23,10 @@ kIsCompletelyTest = True
 kIsErrorInspect = True
 
 kBatchSize = 2048
-kLoadModelNum = 35
+kLoadModelNum = 76
 
-kH5DataPath = os.path.join('..', 'data', 'h5data.diff_module_same_mac_43')
-kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.2048hs.LSTM.log')
+kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
+kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
 
 kHotClean = False
 
