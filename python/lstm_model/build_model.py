@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 class BuildModel():
 	def __init__(self, num_classes, total_sample_length=10000, time_steps=50, num_hidden=1024):
 		self.num_classes = num_classes
@@ -52,3 +53,21 @@ class BuildModel():
 		# Evaluate model (with test logits, for dropout to be disabled)
 		correct_pred = tf.equal(tf.argmax(self.prediction, 1), tf.argmax(self.Y, 1))
 		return tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+
+
+if __name__ == '__main__':
+	"""Try to calculate the param_num and FLOPs """
+	lstm_model = BuildModel(num_classes=43)
+	lstm_model.X = tf.placeholder('float32', [1, lstm_model.TIMESTEPS, lstm_model.NUM_INPUT])
+	lstm_model.Y = tf.placeholder('int8', [1, lstm_model.num_classes])
+	lstm_model.build()
+
+	run_meta = tf.RunMetadata()
+	with tf.Session(graph=tf.Graph()) as sess:
+		opts = tf.profiler.ProfileOptionBuilder.float_operation()
+		flops = tf.profiler.profile(sess.graph, run_meta=run_meta, cmd='op', options=opts)
+
+		opts = tf.profiler.ProfileOptionBuilder.trainable_variables_parameter()
+		params = tf.profiler.profile(sess.graph, run_meta=run_meta, cmd='op', options=opts)
+
+		print("{} --- {}".format(flops.total_float_ops, params.total_parameters))
