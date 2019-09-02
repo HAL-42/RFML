@@ -14,6 +14,7 @@ from logging import handlers
 
 import sys
 import os
+import pprint
 sys.path.append(os.path.join('.', 'my_py_tools'))
 import colorlog as cl
 
@@ -71,6 +72,9 @@ class Logger(object):
             th.setFormatter(file_format_str)  # 设置文件里写入的格式
             self.logger.addHandler(th)
 
+    @staticmethod
+    def pformat(obj):
+        return obj if isinstance(obj, str) else pprint.pformat(obj)
 
 sh_logger = Logger().logger
 
