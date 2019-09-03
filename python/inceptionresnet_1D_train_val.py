@@ -24,11 +24,11 @@ import time
 # ! Manual Setting
 kBatchSize = 25
 kLearningRate = 0.001
-kNumEpochs = 50
+kNumEpochs = 3
 kSnapshotMaxToKeep = 20
 
 kH5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
-kLogPathComment = ''
+kLogDirComment = ''
 kTrainLogInterval = 10
 kTestLogMultiplier = 5
 kTestSamplesNum = 250
@@ -38,18 +38,19 @@ kRecoverEpochID = 0
 
 kIOnly = True
 # ! Automatic Generated
-kLogPath = os.path.join('.', 'log', f'torch.{os.path.split(kH5DataDir)[1]}.ICRS.{kLogPathComment}.log')
-kTrainValLogFile = os.path.join(kLogPath, 'train_val.log')
+kLogDir = os.path.join('.', 'log', f'torch.{os.path.split(kH5DataDir)[1]}.ICRS.{kLogDirComment}.log')
+kTrainValLogFile = os.path.join(kLogDir, 'train_val.log')
 
 kH5ModuleDataDir = os.path.join(kH5DataDir, 'h5_module_data')
 kH5TrainTestDataDir = os.path.join(kH5DataDir, 'h5_train_test_split')
-kSnapshotFileStr = os.path.join(kLogPath, 'snapshot', 'InceptionResNet1D-{}.snapshot')
+kSnapshotFileStr = os.path.join(kLogDir, 'snapshot', 'InceptionResNet1D-{}.snapshot')
 
 kRecoverMetaFile = kSnapshotFileStr.format(kRecoverEpochID)
 kRecoverDataFile = kSnapshotFileStr.format(kRecoverEpochID)
 
 def TestSamples(samples, gts, net, tester):
-    cumsum_loss = 0
+    net.eval()
+    sum_loss = 0
     i1 = 0
     while i1 < len(samples):
         if i1 + kBatchSize < len(samples):
@@ -62,18 +63,19 @@ def TestSamples(samples, gts, net, tester):
         batch_Y = torch.tensor(cpu_batch_Y, dtype=torch.float32, device='cuda')
         with torch.no_grad():
             loss, PR = net.get_cross_entropy_loss(batch_X, batch_Y, need_PR=True, is_expanded_target=True)
-        cumsum_loss += loss * (i2 - i1)
+        sum_loss += loss * (i2 - i1)
         tester.update_confusion_matrix(PR.cpu().numpy(), cpu_batch_Y)
         i1 += kBatchSize
     tester.measure()
-    return float(cumsum_loss) / len(samples), tester.micro_avg_precision
+    net.train()
+    return float(sum_loss) / len(samples), tester.micro_avg_precision
 
 
 if __name__ == '__main__':
     # * data, log manager and saver, testor
     data_manager = DataManager(kH5TrainTestDataDir, kH5ModuleDataDir, I_only=kIOnly, down_sample=0)
     logger = Logger(kTrainValLogFile).logger
-    writer = SummaryWriter(kLogPath)
+    writer = SummaryWriter(kLogDir)
     saver = Saver(kSnapshotFileStr)
     tester = MultiClassificationTester(data_manager.classes_list)
     # * build OR recover model
@@ -103,7 +105,7 @@ if __name__ == '__main__':
         data_manager.init_epoch()
         train_batches = data_manager.get_train_batches(kBatchSize)
         # * Init iteration
-        cumsum_loss = 0
+        sum_loss = 0
         # * Process bar
         process_bar = ProcessBar(batches_num)
         for i, train_batch in enumerate(train_batches):
@@ -114,13 +116,13 @@ if __name__ == '__main__':
             batch_Y = torch.tensor(cpu_batch_Y, dtype=torch.float32, device='cuda')
             # Test every log_interval iteration
             if iteration % kTrainLogInterval == 0 and iteration != 0:
-                train_loss = cumsum_loss / kTrainLogInterval
+                train_loss = sum_loss / kTrainLogInterval
                 tester.measure()
                 train_accuracy = tester.micro_avg_precision
                 writer.add_scalar('train/loss', train_loss, global_step=iteration)
                 writer.add_scalar('train/accuracy', train_accuracy, global_step=iteration)
                 # * Reset static loss
-                cumsum_loss = 0
+                sum_loss = 0
                 # * Restart for test
                 tester.restart()
                 if (iteration / kTrainLogInterval) % kTestLogMultiplier == 0:
@@ -149,13 +151,14 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
             tester.update_confusion_matrix(PR.cpu().numpy(), cpu_batch_Y)
-            cumsum_loss += float(loss)
+            sum_loss += float(loss)
             # * Update bar and iteration
             iteration += 1
             process_bar.UpdateBar(i + 1)
         process_bar.Close()
         # ! Save model for this epoch
-        saver.save(epochID=epochID, model=net, optimizer=optimizer)
+        saver.save(epochID=epochID, model=net, optimizer=optimizer,
+                   )
         logger.info("It Cost {}s to finish this epoch".format(time.time() - epoch_start_time))
     writer.close()
 
