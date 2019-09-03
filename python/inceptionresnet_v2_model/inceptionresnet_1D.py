@@ -12,6 +12,7 @@ import thop
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from my_py_tools.quick_init import QuickInit
 
 
 class BasicConv1d(nn.Module):
@@ -306,20 +307,16 @@ class ReductionCPlus(nn.Module):
 
 class InceptionResNet1D(nn.Module):
 
-    def __init__(self, num_classes, num_input_channels=1, len_sample=10000, batch_size = None,
+    def __init__(self, num_classes, num_input_channels=1, len_sample=10000, batch_size=None,
                  num_incept_A=10, num_incept_B=20, num_incept_C=10,
                  scale_A=0.17, scale_B=0.1, scale_C=0.2,
                  mean = None):
         super(InceptionResNet1D, self).__init__()
         # * Special attributes
+        self.model_init_dict = QuickInit(self, locals())
+
         self.input_size = (batch_size, num_input_channels, len_sample)
-        self.mean = mean
-        self.scale_A = scale_A
-        self.scale_B = scale_B
-        self.scale_A = scale_C
-        self.num_incept_A = num_incept_A
-        self.num_incept_B = num_incept_B
-        self.num_incept_C = num_incept_C
+
         # * Modules
         self.stem = Stem(num_input_channels)
         # ** A
@@ -358,7 +355,7 @@ class InceptionResNet1D(nn.Module):
         return x
 
     def _get_logits(self, input):
-        assert input.size() == self.input_size, "input.size() != self.input_size."
+        # assert input.shape[1:] == self.input_size[1:], "input.size() != self.input_size."
         return self.forward(input)
 
     def _get_PR_classes(self, input, need_logits=False):
@@ -388,7 +385,9 @@ class InceptionResNet1D(nn.Module):
 
 
 if __name__ == "__main__":
-    net = InceptionResNet1D(43, num_input_channels=1, batch_size=1)
+    net = InceptionResNet1D(43, num_input_channels=1, batch_size=1,
+                            num_incept_A=5, num_incept_B=10, num_incept_C=5,
+                            scale_A=0.34, scale_B=0.2, scale_C=0.4)
     input = torch.randn(net.input_size)
     net(input)
     flops, params = thop.profile(net, inputs=(input, ))

@@ -158,7 +158,7 @@ if __name__ == '__main__':
         process_bar.Close()
         # ! Save model for this epoch
         saver.save(epochID=epochID, model=net, optimizer=optimizer,
-                   )
+                   model_init_dict=net.model_init_dict)
         logger.info("It Cost {}s to finish this epoch".format(time.time() - epoch_start_time))
     writer.close()
 
