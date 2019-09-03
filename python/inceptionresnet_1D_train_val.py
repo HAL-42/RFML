@@ -24,10 +24,10 @@ import time
 # ! Manual Setting
 kBatchSize = 25
 kLearningRate = 0.001
-kNumEpochs = 3
+kNumEpochs = 20
 kSnapshotMaxToKeep = 20
 
-kH5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
+kH5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
 kLogDirComment = ''
 kTrainLogInterval = 10
 kTestLogMultiplier = 5
@@ -158,7 +158,7 @@ if __name__ == '__main__':
         process_bar.Close()
         # ! Save model for this epoch
         saver.save(epochID=epochID, model=net, optimizer=optimizer,
-                   )
+                   model_init_dict=net.model_init_dict)
         logger.info("It Cost {}s to finish this epoch".format(time.time() - epoch_start_time))
     writer.close()
 

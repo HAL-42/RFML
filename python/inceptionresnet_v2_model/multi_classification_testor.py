@@ -26,6 +26,7 @@ class MultiClassificationTester(object):
         self.pd_confusion_matrix = pd.DataFrame(data=self.confusion_matrix,
                                                 index=classes_list, columns=classes_list)
         self.confusion_list_matrix = np.empty((self.classes_num, self.classes_num), dtype=np.object)
+        self.num_samples_updated = 0
         for row in range(self.classes_num):
             for col in range(self.classes_num):
                 self.confusion_list_matrix[row, col] = list()
@@ -56,6 +57,7 @@ class MultiClassificationTester(object):
         for row in range(self.classes_num):
             for col in range(self.classes_num):
                 self.confusion_list_matrix[row, col] = list()
+        self.num_samples_updated = 0
         self._is_measured = False
 
     def update_confusion_matrix(self, samples_predict_vec: np.ndarray, samples_gt_vec: np.ndarray):
@@ -64,8 +66,10 @@ class MultiClassificationTester(object):
 
         for i in range(samples_predict.shape[0]):
             self.confusion_matrix[samples_gt[i], samples_predict[i]] += 1
-            self.confusion_list_matrix[samples_gt[i], samples_predict[i]].append(i)
+            self.confusion_list_matrix[samples_gt[i], samples_predict[i]].append(i + self.num_samples_updated)
         self._is_measured = False
+        self.num_samples_updated += samples_predict.shape[0]
+        return self.num_samples_updated
 
     def measure(self, weighted_macro_avg: bool = False, probability_weight: Optional[np.ndarray]=None):
         self.classes_gt_num = np.sum(self.confusion_matrix, axis=1)
