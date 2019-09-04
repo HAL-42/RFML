@@ -13,7 +13,6 @@ import numpy as np
 import torch
 from inceptionresnet_v2_model.data_manager import DataManager
 from my_py_tools.my_logger import Logger, sh_logger
-import my_py_tools.const as K
 from my_py_tools.my_process_bar import ProcessBar
 from inceptionresnet_v2_model.multi_classification_testor import MultiClassificationTester
 from matplotlib import pyplot as plt
@@ -21,12 +20,15 @@ from data_process_patch import BatchCleaner
 from inceptionresnet_v2_model.inceptionresnet_1D import InceptionResNet1D
 from inceptionresnet_v2_model.torch_saver import Saver
 
+from my_py_tools.const import Const
+K = Const()
+
 # ! Manual Setting Const
 # * Path Setting
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
 K.LogDirComment = ''
 # * Recover Setting
-K.LoadModelNum = -1
+K.LoadModelNum = 0
 # * Testing Setting
 K.BatchSize = 25
 K.TestSamplesNum = 1000
@@ -88,7 +90,7 @@ def RandomSelectWaves(gt_class, predict_class, tester, data_manager, max_to_sele
         return waves
 
 
-def TestSamples(samples, gts, net, tester):
+def TestSamples(samples, gts, net, tester, device='cuda'):
     sum_loss = 0
     i1 = 0
     while i1 < len(samples):
@@ -97,9 +99,9 @@ def TestSamples(samples, gts, net, tester):
         else:
             i2 = len(samples)
         batch_X = samples[i1:i2].reshape(i2 - i1, 1 if K.IOnly else 2, -1)
-        batch_X = torch.tensor(batch_X, dtype=torch.float32, device=K.Device)
+        batch_X = torch.tensor(batch_X, dtype=torch.float32, device=device)
         cpu_batch_Y = gts[i1:i2]
-        batch_Y = torch.tensor(cpu_batch_Y, dtype=torch.float32, device=K.Device)
+        batch_Y = torch.tensor(cpu_batch_Y, dtype=torch.float32, device=device)
         # * Forward
         loss, PR = net.get_cross_entropy_loss(batch_X, batch_Y, need_PR=True, is_expanded_target=True)
         sum_loss += loss * (i2 - i1)
@@ -121,7 +123,7 @@ def ErrorInspect(data_manager, net, tester):
             samples, gts = data_manager.get_random_test_samples(K.TestSamplesNum)
             # if K.HotClean:
             #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
-            TestSamples(samples, gts, net, tester)
+            TestSamples(samples, gts, net, tester, device=K.Device)
         if first_inspect:
             first_inspect = False
         # ! Decide whether use this test result
@@ -182,7 +184,7 @@ def CompletelyTest(data_manager, net, tester):
         samples, gts = test_batch
         # if K.HotClean:
         #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
-        TestSamples(samples, gts, net, tester)
+        TestSamples(samples, gts, net, tester, device=K.Device)
         tester.show_confusion_matrix()
 
         process_bar.UpdateBar(i + 1)
@@ -204,7 +206,7 @@ if __name__ == '__main__':
     net, _ = saver.restore(K.LoadModelNum, model_cls=InceptionResNet1D, optimizer_cls=None, device=K.Device)
     net.to(K.Device)
 
-    with torch.no_grad:
+    with torch.no_grad():
         net.eval()
 
         if K.IsCompletelyTest:
