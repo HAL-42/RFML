@@ -59,7 +59,7 @@ class Saver(object):
             model.load_state_dict(save_dict.get('model_state_dict', {}))
         else:
             model = None
-        # * Retore optimizer
+        # * Restore optimizer
         if optimizer_cls != None:
             optimizer = optimizer_cls()
             optimizer.load_state_dict(save_dict.get('optimizer_state_dict', {}))
