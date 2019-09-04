@@ -11,7 +11,7 @@
 import sys
 
 
-class _const:
+class _const(object):
     class ConstError(TypeError):
         pass
 
@@ -22,7 +22,7 @@ class _const:
         if name in self.__dict__:
             raise self.ConstError("Can't change const.%s" % name)
 
-        self.__dict__[name] = value
+        object.__setattr__(self, name, value)
 
     def __delattr__(self, name):
         if name in self.__dict__:
@@ -31,3 +31,4 @@ class _const:
 
 
 sys.modules[__name__] = _const()
+# K = _const()
