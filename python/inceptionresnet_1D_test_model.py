@@ -28,12 +28,12 @@ K = Const()
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
 K.LogDirComment = ''
 # * Recover Setting
-K.LoadModelNum = 0
+K.LoadModelNum = 900
 # * Testing Setting
-K.BatchSize = 25
+K.BatchSize = 500
 K.TestSamplesNum = 1000
 # * Device Setting: 'cuda' or 'cpu'
-K.Device = 'cpu'
+K.Device = 'cuda'
 # K.HotClean = False
 # * Other settings
 K.IOnly = True       # Use I or both I+Q for testing
@@ -45,7 +45,7 @@ K.H5ModuleDataDir = os.path.join(K.H5DataDir, 'h5_module_data')
 K.H5TrainTestDataDir = os.path.join(K.H5DataDir, 'h5_train_test_split')
 
 K.LogDir = os.path.join('.', 'log', f'torch.{os.path.split(K.H5DataDir)[1]}.ICRS.{K.LogDirComment}.log')
-K.TestResultPath = os.path.join(K.LogDir, 'final_test_result')
+K.TestResultPath = os.path.join(K.LogDir, f'final_test_result-{K.LoadModelNum}')
 K.SnapshotFileStr = os.path.join(K.LogDir, 'snapshot', 'InceptionResNet1D-{}.snapshot')
 
 
@@ -90,12 +90,12 @@ def RandomSelectWaves(gt_class, predict_class, tester, data_manager, max_to_sele
         return waves
 
 
-def TestSamples(samples, gts, net, tester, device='cuda'):
+def TestSamples(samples, gts, net, tester, device='cuda', batch_size=K.BatchSize):
     sum_loss = 0
     i1 = 0
     while i1 < len(samples):
-        if i1 + K.BatchSize < len(samples):
-            i2 = i1 + K.BatchSize
+        if i1 + batch_size < len(samples):
+            i2 = i1 + batch_size
         else:
             i2 = len(samples)
         batch_X = samples[i1:i2].reshape(i2 - i1, 1 if K.IOnly else 2, -1)
@@ -106,7 +106,7 @@ def TestSamples(samples, gts, net, tester, device='cuda'):
         loss, PR = net.get_cross_entropy_loss(batch_X, batch_Y, need_PR=True, is_expanded_target=True)
         sum_loss += loss * (i2 - i1)
         tester.update_confusion_matrix(PR.cpu().numpy(), cpu_batch_Y)
-        i1 += K.BatchSize
+        i1 += batch_size
     tester.measure()
     return float(sum_loss) / len(samples), tester.micro_avg_precision
 

@@ -26,8 +26,8 @@ K = Const()
 
 # ! Manual Setting
 # * Path Setting
-K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
-K.LogDirComment = ''
+K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
+K.LogDirComment = 'V2-B27-lre-3'
 # * Model ,Optimizer and Recover Setting
 K.IsRecover = False
 K.LoadModelNum = -1
@@ -39,13 +39,14 @@ K.ModelSettings = {
 # ** Optimizer Setting
 K.LearningRate = 0.001
 # * Training Setting
-K.BatchSize = 25
-K.NumEpochs = 2
+K.BatchSize = 27
+K.NumEpochs = 20
 # * Log, test and Snapshot Setting
 K.TrainLogInterval = 10
-K.TestLogMultiplier = 10
-K.SnapshotMultiplier = 3
-K.TestSamplesNum = 1000
+K.TestLogMultiplier = 30
+K.SnapshotMultiplier = 2
+K.TestSamplesNum = 2500
+K.TestBatchSize = 100
 # * Other Setting: Should Use both I+Q or just use I to train
 K.IOnly = True
 # ! Automatic Generated Setting
@@ -124,7 +125,7 @@ if __name__ == '__main__':
                 # Test in eval+no_grad mode
                 with torch.no_grad():
                     net.eval()
-                    test_loss, test_accuracy = TestSamples(test_X, test_Y, net, tester)
+                    test_loss, test_accuracy = TestSamples(test_X, test_Y, net, tester, batch_size=K.TestBatchSize)
                 net.train()
                 writer.add_scalar('test/loss', test_loss, global_step=iteration)
                 writer.add_scalar('test/accuracy', test_accuracy, global_step=iteration)
