@@ -8,20 +8,22 @@ from my_py_tools.my_process_bar import ProcessBar
 import time
 
 # ! Manual Setting
-kBatchSize = 2048
+kBatchSize = 32
 kLearningRate = 0.001
-kNumEpochs = 50
+kNumEpochs = 20
 kSnapshotMaxToKeep = 20
 kHiddenStateNum = 1024
 
 kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
-kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] +'.LSTM.log')
+kLogPathComment = 'B32-lre-3'
 
-kIsRecover = True
+kIsRecover = False
 kRecoverEpochNum = 24
 # ! Automatic Generated
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
 kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
+
+kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + f'.LSTM.{kLogPathComment}.log')
 kSnapshotPath = os.path.join(kLogPath, 'snapshot', 'LSTM')
 
 kRecoverMetaFile = kSnapshotPath + '-{}.meta'.format(kRecoverEpochNum)
