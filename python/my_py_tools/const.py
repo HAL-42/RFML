@@ -30,5 +30,6 @@ class _const(object):
         raise NameError(name)
 
 
-sys.modules[__name__] = _const()
+# sys.modules[__name__] = _const()
 # K = _const()
+Const = _const
