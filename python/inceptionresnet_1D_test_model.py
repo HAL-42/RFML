@@ -13,6 +13,7 @@ import numpy as np
 import torch
 from inceptionresnet_v2_model.data_manager import DataManager
 from my_py_tools.my_logger import Logger, sh_logger
+import my_py_tools.const as K
 from my_py_tools.my_process_bar import ProcessBar
 from inceptionresnet_v2_model.multi_classification_testor import MultiClassificationTester
 from matplotlib import pyplot as plt
@@ -21,27 +22,29 @@ from inceptionresnet_v2_model.inceptionresnet_1D import InceptionResNet1D
 from inceptionresnet_v2_model.torch_saver import Saver
 
 # ! Manual Setting Const
-kIsCompletelyTest = True
-kIsErrorInspect = True
-
-kBatchSize = 25
-kLoadModelNum = -1
-kTestSamplesNum = 1000
-
-kH5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
-kLogDirComment = ''
-
-kDevice = 'cpu'
-
-# kHotClean = False
-
-kIOnly = True
+# * Path Setting
+K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
+K.LogDirComment = ''
+# * Recover Setting
+K.LoadModelNum = -1
+# * Testing Setting
+K.BatchSize = 25
+K.TestSamplesNum = 1000
+# * Device Setting: 'cuda' or 'cpu'
+K.Device = 'cpu'
+# K.HotClean = False
+# * Other settings
+K.IOnly = True       # Use I or both I+Q for testing
+# * Test Mode Setting
+K.IsCompletelyTest = True
+K.IsErrorInspect = True
 # ! Automatic Generated Const
-kLogDir = os.path.join('.', 'log', f'torch.{os.path.split(kH5DataDir)[1]}.ICRS.{kLogDirComment}.log')
-kH5ModuleDataDir = os.path.join(kH5DataDir, 'h5_module_data')
-kH5TrainTestDataDir = os.path.join(kH5DataDir, 'h5_train_test_split')
-kTestResultPath = os.path.join(kLogDir, 'final_test_result')
-kSnapshotFileStr = os.path.join(kLogDir, 'snapshot', 'InceptionResNet1D-{}.snapshot')
+K.H5ModuleDataDir = os.path.join(K.H5DataDir, 'h5_module_data')
+K.H5TrainTestDataDir = os.path.join(K.H5DataDir, 'h5_train_test_split')
+
+K.LogDir = os.path.join('.', 'log', f'torch.{os.path.split(K.H5DataDir)[1]}.ICRS.{K.LogDirComment}.log')
+K.TestResultPath = os.path.join(K.LogDir, 'final_test_result')
+K.SnapshotFileStr = os.path.join(K.LogDir, 'snapshot', 'InceptionResNet1D-{}.snapshot')
 
 
 def PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list):
@@ -80,7 +83,7 @@ def RandomSelectWaves(gt_class, predict_class, tester, data_manager, max_to_sele
         waves = [data_manager._get_sample('test', data_manager.shuffled_test_index[index])[0]
                  for index in selected_indexes]
         waves = np.array(waves, dtype=np.float32)
-        if not kIOnly:
+        if not K.IOnly:
             waves = waves[:, :waves.shape[1] / 2] # Only return I data
         return waves
 
@@ -89,19 +92,19 @@ def TestSamples(samples, gts, net, tester):
     sum_loss = 0
     i1 = 0
     while i1 < len(samples):
-        if i1 + kBatchSize < len(samples):
-            i2 = i1 + kBatchSize
+        if i1 + K.BatchSize < len(samples):
+            i2 = i1 + K.BatchSize
         else:
             i2 = len(samples)
-        batch_X = samples[i1:i2].reshape(i2 - i1, 1 if kIOnly else 2, -1)
-        batch_X = torch.tensor(batch_X, dtype=torch.float32, device=kDevice)
+        batch_X = samples[i1:i2].reshape(i2 - i1, 1 if K.IOnly else 2, -1)
+        batch_X = torch.tensor(batch_X, dtype=torch.float32, device=K.Device)
         cpu_batch_Y = gts[i1:i2]
-        batch_Y = torch.tensor(cpu_batch_Y, dtype=torch.float32, device=kDevice)
-        with torch.no_grad():
-            loss, PR = net.get_cross_entropy_loss(batch_X, batch_Y, need_PR=True, is_expanded_target=True)
+        batch_Y = torch.tensor(cpu_batch_Y, dtype=torch.float32, device=K.Device)
+        # * Forward
+        loss, PR = net.get_cross_entropy_loss(batch_X, batch_Y, need_PR=True, is_expanded_target=True)
         sum_loss += loss * (i2 - i1)
         tester.update_confusion_matrix(PR.cpu().numpy(), cpu_batch_Y)
-        i1 += kBatchSize
+        i1 += K.BatchSize
     tester.measure()
     return float(sum_loss) / len(samples), tester.micro_avg_precision
 
@@ -110,13 +113,13 @@ def ErrorInspect(data_manager, net, tester):
     # ! Start Inspect
     first_inspect = True
     while True:
-        if first_inspect and kIsCompletelyTest:
+        if first_inspect and K.IsCompletelyTest:
             tester.show_confusion_matrix()
         else:
             # ! Get a test batch then show test result
             tester.restart()
-            samples, gts = data_manager.get_random_test_samples(kTestSamplesNum)
-            # if kHotClean:
+            samples, gts = data_manager.get_random_test_samples(K.TestSamplesNum)
+            # if K.HotClean:
             #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
             TestSamples(samples, gts, net, tester)
         if first_inspect:
@@ -171,38 +174,41 @@ def ErrorInspect(data_manager, net, tester):
 def CompletelyTest(data_manager, net, tester):
     tester.restart()
     # ! Start test data by batches
-    test_batches = data_manager.get_test_batches(kBatchSize)
+    test_batches = data_manager.get_test_batches(K.BatchSize)
     # ! Start Test
-    batch_num = int(np.ceil(data_manager.test_samples_num / kBatchSize))
+    batch_num = int(np.ceil(data_manager.test_samples_num / K.BatchSize))
     process_bar = ProcessBar(batch_num)
     for i, test_batch in enumerate(test_batches):
         samples, gts = test_batch
-        # if kHotClean:
+        # if K.HotClean:
         #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
         TestSamples(samples, gts, net, tester)
         tester.show_confusion_matrix()
 
         process_bar.UpdateBar(i + 1)
     # ! Show test result
-    if not os.path.isdir(kTestResultPath):
-        os.makedirs(kTestResultPath)
-    tester.show_confusion_matrix(img_save_path=os.path.join(kTestResultPath, "confusion_matrix.png"))
+    if not os.path.isdir(K.TestResultPath):
+        os.makedirs(K.TestResultPath)
+    tester.show_confusion_matrix(img_save_path=os.path.join(K.TestResultPath, "confusion_matrix.png"))
     tester.measure()
-    tester.show_measure_result(rslt_save_path=os.path.join(kTestResultPath, "test_result.txt"))
+    tester.show_measure_result(rslt_save_path=os.path.join(K.TestResultPath, "test_result.txt"))
 
 
 if __name__ == '__main__':
     # ! Init saver, sess, and data manager
-    data_manager = DataManager(kH5TrainTestDataDir, kH5ModuleDataDir, I_only=True, down_sample=0)
+    data_manager = DataManager(K.H5TrainTestDataDir, K.H5ModuleDataDir, I_only=True, down_sample=0)
     data_manager.init_epoch()
     tester = MultiClassificationTester(data_manager.classes_list)
-    saver = Saver(kSnapshotFileStr)
+    saver = Saver(K.SnapshotFileStr)
 
-    net, _ = saver.restore(kLoadModelNum, model_cls=InceptionResNet1D, optimizer_cls=None, device=kDevice)
-    net.to(kDevice)
+    net, _ = saver.restore(K.LoadModelNum, model_cls=InceptionResNet1D, optimizer_cls=None, device=K.Device)
+    net.to(K.Device)
 
-    if kIsCompletelyTest:
-        CompletelyTest(data_manager, net, tester)
+    with torch.no_grad:
+        net.eval()
 
-    if kIsErrorInspect:
-        ErrorInspect(data_manager, net, tester)
+        if K.IsCompletelyTest:
+            CompletelyTest(data_manager, net, tester)
+
+        if K.IsErrorInspect:
+            ErrorInspect(data_manager, net, tester)
