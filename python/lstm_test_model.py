@@ -11,10 +11,10 @@
 import os
 import numpy as np
 import tensorflow as tf
-from lstm_model.data_manager import DataManager
+from utils.data_manager import DataManager
 from my_py_tools.my_logger import Logger, sh_logger
 from my_py_tools.my_process_bar import ProcessBar
-from lstm_model.multi_classification_testor import MultiClassificationTester
+from utils.multi_classification_testor import MultiClassificationTester
 from matplotlib import pyplot as plt
 from data_process_patch import BatchCleaner
 

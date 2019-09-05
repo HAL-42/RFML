@@ -11,10 +11,10 @@
 import os
 import numpy as np
 import torch
-from inceptionresnet_v2_model.data_manager import DataManager
+from utils.data_manager import DataManager
 from my_py_tools.my_logger import Logger, sh_logger
 from my_py_tools.my_process_bar import ProcessBar
-from inceptionresnet_v2_model.multi_classification_testor import MultiClassificationTester
+from utils.multi_classification_testor import MultiClassificationTester
 from matplotlib import pyplot as plt
 from data_process_patch import BatchCleaner
 from inceptionresnet_v2_model.inceptionresnet_1D import InceptionResNet1D

@@ -2,7 +2,7 @@ import os
 import numpy as np
 import tensorflow as tf
 from lstm_model.build_model import BuildModel
-from lstm_model.data_manager import DataManager
+from utils.data_manager import DataManager
 from my_py_tools.my_logger import Logger
 from my_py_tools.my_process_bar import ProcessBar
 import time
