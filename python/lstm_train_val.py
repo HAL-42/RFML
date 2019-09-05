@@ -10,15 +10,15 @@ import time
 # ! Manual Setting
 kBatchSize = 32
 kLearningRate = 0.001
-kNumEpochs = 20
+kNumEpochs = 30
 kSnapshotMaxToKeep = 20
 kHiddenStateNum = 1024
 
-kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
+kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
 kLogPathComment = 'B32-lre-3'
 
 kIsRecover = False
-kRecoverEpochNum = 24
+kRecoverEpochNum = 19
 # ! Automatic Generated
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
 kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')

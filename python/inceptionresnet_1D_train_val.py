@@ -29,8 +29,8 @@ K = Const()
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
 K.LogDirComment = 'V2-B27-lre-3'
 # * Model ,Optimizer and Recover Setting
-K.IsRecover = False
-K.LoadModelNum = -1
+K.IsRecover = True
+K.LoadModelNum = 7200
 # ** Model Init Setting
 K.ModelSettings = {
     'num_incept_A': 10, 'num_incept_B': 20, 'num_incept_C': 10,

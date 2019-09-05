@@ -23,18 +23,20 @@ kIsCompletelyTest = True
 kIsErrorInspect = True
 
 kBatchSize = 2048
-kLoadModelNum = 76
+kLoadModelNum = 19
 
-kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + '.LSTM.log')
+kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
+kLogPathComment = 'B32-lre-3'
 
 kHotClean = False
 
 # ! Automatic Generated Const
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
 kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
+
+kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + f'.LSTM.{kLogPathComment}.log')
 kSnapshotPath = os.path.join(kLogPath, 'snapshot', 'LSTM')
-kTestResultPath = os.path.join(kLogPath, 'final_test_result')
+kTestResultPath = os.path.join(kLogPath, f'final_test_result-{kLoadModelNum}')
 
 
 def PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list):
