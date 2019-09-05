@@ -9,11 +9,104 @@ Omitted
 
 ## Current Achievement
 
-* Collect Data of same_module_same_mac, same_module_diff_mac, diff_module_diff_mac(mini5&43)
-* Generate pre-split Train/Test set  for each dataset
-* A data processing program including converting csv/txt data to h5 data
+### Dataset & Data Cleaning
 
-* Experiment on each mini5 dataset
+* A Program to give fake mac address
+* Collect Data of same_module_same_mac, same_module_diff_mac, diff_module_diff_mac(mini5&43)[CSV]
+* Trunk & Normalize the data
+  * **TODO**: 2-D Normalize
+  * **TODO**: Noise Add
+* Generate each module's dataset + pre-split Train/Test dataset  from each dataset[h5]
+* Solve the quite tail problem[clean_h5]
+
+>**Files**
+>
+>* On my disk + Remote server + Github(only metadata)
+>  * data.diff_module_same_mac_mini5/data.diff_module_same_mac_mini5   //Origin csv data of diff module  same mac
+>  * h5data.diff_module_same_mac_mini5/data.diff_module_same_mac_mini5
+>     * h5_module_data               //Normalized, Trunked data for each module, and converted to h5
+>        * meta data           //txt, how many samples each module have
+>        * h5 data               //split every 50000 samples (Some ML tools like Caffe only accept h5 < 4G)
+>     * h5_train_test_split             //Pre-Split Train/Test data set with training proportion 80%
+>       - meta data           //JSON, information about the split
+>       - h5 data               //split every 50000samples (Some ML tools like Caffe only accept h5 < 4G)
+> * clean_h5data.diff_module_same_mac_mini5/data.diff_module_same_mac_mini5  //Cleaned dataset(No quite tail)
+> * data.same_module_diff_mac_mini5   //Origin csv data of diff module  same mac
+> * h5data.same_module_diff_mac_mini5  //h5 version of origin data
+>* On other disk
+> * original data of same_module_diff_mac43, diff_module_diff_mac43+mini5, may be some h5 version
+
+### Model
+
+* LSTM model
+* InceptionResNet model
+* TODO: DAE
+
+> **File: All on Github**
+>
+> * utils
+>   * data_manager.py: Kindly like the pytorch API DataLoader, but have more function. Basically, it can be used to get shuffled test/train batches from h5 dataset, normalize data and add noise
+>   * multiclass_tester.py: Track the confusion matrix, F1 score, accuracy and other measurement index.
+> * InceptionResNet: pytorch
+>   * inceptionresnet_v2_model
+>     * inceptionresnet_v2.py  //Build model
+>     * troch_saver.py             //Save training state and recover training state from snapshot
+>   * inceptionresnet_train_val   //Train the model, take snapshot and generate train/test's accuracy and loss curve
+>   * inceptionresnet_test_model  //Test model(get confusion matrix, accuracy, F1 score so on) and interactively inspect the classification error
+> * LSTM   //Same to InceptionResNetV2: tensorflow
+
+### Experiment
+
+// Mini5 Experiment help us to find the best training 
+
+* Set machine Learning Environment on GCP
+* TODO: Experiment on diff module same mac(With Best Model)
+* LSTM Experiment on each mini5 dataset
+* LSTM Experiment on 43 dataset
+* New CNN Model
+
+>**File**: On my disk, some snapshot didn't download from remote server
+>
+>For each experiment, there is a log file
+>
+>Eg:
+>
+>torch.clean_h5data.diff_module_same_mac_43.ICRS.V2-B27-lre-3.log  //ML Tools + dataset + Model + Training 
+>
+>Parameters
+>
+>* snapshot                                  //Files save the model parameter, optimizer state so on.
+>* summary OR model_name_train/test(For tensorflow)    //Tensorboard Summary, train/test loss&accuracy > curve. Some time also have the compute graph
+>* train_val.log                              //txt file, the output during training also write to this log
+>* final_test-{iteration_num}          //Test Result
+>  * confusion_matrix.png
+>  * error_inspect                     //Maybe, must have for mini5
+>  * confusion_matrix.txt
+>  * test_result                           //test samples num, each class's predict/gt num, F1 score, macro/micro accuracy, etc. 
+>
+>
+
+> **Other Files**
+>
+> data_process.py + data_process_patch.py   //process the data
+>
+> my_py_tools            //useful tools like Process bar,  colorful print, logger, const manager, etc.
+>
+> Insights.md + doc  //figure, doc, discussion
+
+
+
+## Experiment Plan
+
+***
+
+See the Excel
+
+
+
+
+
+
 
 
 
@@ -25,6 +118,11 @@ Omitted
 ## Switch to h5 file
 
 The old code load data from csv/txt, which cost a lot of time to read and convert string data to float32. Now we load data from h5 which data is in the right format and stored continuously, it's proved that this method is far more quicker than csv/txt method.
+
+In summary:
+
+* HDF5 is widely used in machine learning area. C, Matlab can also use it.
+* HDF5 is much more small than csv, while much more quicker when load and save the data.
 
 **H5 On My Laptop**
 
@@ -62,7 +160,17 @@ Compute Cost 0.8686928749084473s
 Read Batch Cost 4.979849338531494s
 ```
 
+***
 
+## Why Need Mini5 and 43 dataset
+
+43 trained is the model we finally want to get.
+
+ MINI5's train and test is quicker, it can help us:
+
+* Decide is one model practical
+* Adjust the training parameter
+* The interactive error inspect program only works on local computer currently, and on mini5, the inspect may much more quicker and thoroughly(can inspect each misclassifying situation).
 
 ***
 
@@ -220,3 +328,30 @@ Write a program to kick out the wave:
 * Power difference between first and last quarter is too large.
 
 We can add this program to training and testing. Or create an new clean dataset.
+
+***
+
+## About Fake Mac Address
+
+Theoretically, if we want model to learn analog only and ignore the digital information, each module should send random data, or at least random mac address.
+
+For I'm kink of worrying the the random data is little "hard" for out model, and we can't send totally random mac address(there is format demands) and it need time to read protocol. So finally we set each module's mac address same.
+
+***
+
+
+## About Normalize and Noise
+
+We use Max Normalize.
+
+And for I-only input and I/Q input, the normalize program is different: I-only is real number normalize, and I/Q input is complex number normalize. For if we use complex normalize to I-only input, then the Q information is mixed in.
+
+Another question is if we generate two data set for this two different normalize method, the dataset is too big(76G).
+
+So, can we first do real normalize, then do complex normalize? Is the indirect complex normalize data is same to direct complex normalize?
+
+I already prove it's practical.
+
+
+
+We use complex gaussian noise
