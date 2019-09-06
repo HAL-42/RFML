@@ -23,13 +23,14 @@ kIsCompletelyTest = True
 kIsErrorInspect = True
 
 kBatchSize = 2048
-kLoadModelNum = 19
+kLoadModelNum = 59
 
 kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
-kLogPathComment = 'B32-lre-3'
+kLogPathComment = 'B2048-lre-3'
 
 kHotClean = False
 
+kIOnly = True
 # ! Automatic Generated Const
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
 kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
@@ -37,6 +38,12 @@ kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
 kLogPath = os.path.join('.', 'log', 'tf.' + os.path.split(kH5DataPath)[1] + f'.LSTM.{kLogPathComment}.log')
 kSnapshotPath = os.path.join(kLogPath, 'snapshot', 'LSTM')
 kTestResultPath = os.path.join(kLogPath, f'final_test_result-{kLoadModelNum}')
+
+def ZipIQ(batch_IQ):
+    zip_batch_IQ = np.empty(batch_IQ.shape, dtype=np.float32)
+    zip_batch_IQ[:, 0::2] = batch_IQ[:, :batch_IQ.shape[1] / 2]
+    zip_batch_IQ[:, 1::2] = batch_IQ[:, batch_IQ.shape[1] / 2:]
+    return zip_batch_IQ
 
 
 def PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list):
@@ -60,7 +67,7 @@ def PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list):
     plt.show()
 
 
-def RandomSelectWaves(gt_class, predict_class, tester, batch_X, max_to_select=1):
+def RandomSelectWaves(gt_class, predict_class, tester, data_manager, max_to_select=1):
     # ! Get waves' index list
     row = tester.classes_list.index(gt_class)
     col = tester.classes_list.index(predict_class)
@@ -72,8 +79,12 @@ def RandomSelectWaves(gt_class, predict_class, tester, batch_X, max_to_select=1)
         select_num = min(len(indexes), max_to_select)
         selected_indexes = np.random.choice(indexes, select_num, replace=False)
 
-        batch_X = batch_X.reshape(batch_X.shape[0], -1)
-        return list(batch_X[selected_indexes, :])
+        waves = [data_manager._get_sample('test', data_manager.shuffled_test_index[index])[0]
+                 for index in selected_indexes]
+        waves = np.array(waves, dtype=np.float32)
+        if not kIOnly:
+            waves = waves[:, :waves.shape[1] / 2] # Only return I data
+        return waves
 
 
 def ErrorInspect(data_manager, sess, tester):
@@ -81,16 +92,23 @@ def ErrorInspect(data_manager, sess, tester):
     input_X = graph.get_tensor_by_name('Placeholder:0')
     softmax_output = graph.get_tensor_by_name('Softmax:0')
     # ! Start Inspect
+    first_inspect = True
     while True:
-        # ! Get a test batch then show test result
-        tester.restart()
-        batch_X, batch_Y = data_manager.get_random_test_samples(kBatchSize)
-        if kHotClean:
-            batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
-        batch_X = batch_X.reshape((batch_X.shape[0], input_X.shape[1], input_X.shape[2]))
-        batch_probability = sess.run(softmax_output, feed_dict={input_X: batch_X})
-        tester.update_confusion_matrix(batch_probability, batch_Y)
-        tester.show_confusion_matrix()
+        if first_inspect and kIsCompletelyTest:
+            tester.show_confusion_matrix()
+            first_inspect = False           # If not completely test, then is first inspect is unimportant
+        else:
+            # ! Get a test batch then show test result
+            tester.restart()
+            batch_X, batch_Y = data_manager.get_random_test_samples(kBatchSize)
+            # if kHotClean:
+            #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
+            if not kIOnly:
+                batch_X = ZipIQ(batch_X)
+            batch_X = batch_X.reshape((batch_X.shape[0], input_X.shape[1], input_X.shape[2]))
+            batch_probability = sess.run(softmax_output, feed_dict={input_X: batch_X})
+            tester.update_confusion_matrix(batch_probability, batch_Y)
+            tester.show_confusion_matrix()
         # ! Decide whether use this test result
         usr_select = input("Start Inspection input i; Retest input others: ")
         if usr_select != 'i':
@@ -113,11 +131,11 @@ def ErrorInspect(data_manager, sess, tester):
                 error_waves_select_num = 3
                 while True:
                     gt_class_wave = RandomSelectWaves(gt_class, gt_class,
-                                                      tester, batch_X)[0]
+                                                      tester, data_manager)[0]
                     predict_class_wave = RandomSelectWaves(predict_class, predict_class,
-                                                           tester, batch_X)[0]
+                                                           tester, data_manager)[0]
                     error_waves_list = RandomSelectWaves(gt_class, predict_class,
-                                                         tester, batch_X, error_waves_select_num)
+                                                         tester, data_manager, error_waves_select_num)
                     PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list)
                     # ! Interact Part
                     usr_select = input("Quick replot input any key; Reselect classes input r; Retest input"
@@ -150,8 +168,12 @@ def CompletelyTest(data_manager, graph, sess, tester):
     process_bar = ProcessBar(batch_num)
     for i, test_batch in enumerate(test_batches):
         batch_X, batch_Y = test_batch
-        if kHotClean:
-            batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
+        # if kHotClean:
+        #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
+        if not kIOnly:
+            batch_X = ZipIQ(batch_X)
+        if kIOnly:
+            batch_X = np.append(batch_X[:, 0::2], batch_X[:, 1::2], axis=1)
         batch_X = batch_X.reshape((batch_X.shape[0], input_X.shape[1], input_X.shape[2]))
         batch_probability = sess.run(softmax_output, feed_dict={input_X: batch_X})
 
@@ -169,7 +191,7 @@ def CompletelyTest(data_manager, graph, sess, tester):
 
 if __name__ == '__main__':
     # ! Init saver, sess, and data manager
-    data_manager = DataManager(kH5TrainTestDataPath, kH5ModuleDataPath, I_only=True, down_sample=0)
+    data_manager = DataManager(kH5TrainTestDataPath, kH5ModuleDataPath, I_only=kIOnly, down_sample=0)
     data_manager.init_epoch()
 
     saver = tf.train.import_meta_graph(kSnapshotPath + '-{}.meta'.format(kLoadModelNum))

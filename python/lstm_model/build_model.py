@@ -2,18 +2,23 @@ import tensorflow as tf
 
 
 class BuildModel():
-	def __init__(self, num_classes, total_sample_length=10000, time_steps=50, num_hidden=1024):
+	def __init__(self, num_classes, total_sample_length=10000, time_steps=50, num_hidden=1024, I_only=True):
 		self.num_classes = num_classes
+		self.I_only = I_only
 
 		self.TOTAL_SAMPLE_LENGTH = total_sample_length
 		self.TIMESTEPS = time_steps
-		self.NUM_INPUT = int(self.TOTAL_SAMPLE_LENGTH / self.TIMESTEPS)
+		if I_only:
+			self.NUM_INPUT = int(self.TOTAL_SAMPLE_LENGTH / self.TIMESTEPS)
+		else:
+			self.NUM_INPUT = int(self.TOTAL_SAMPLE_LENGTH / self.TIMESTEPS) * 2
 		self.NUM_HIDDEN = num_hidden
 
 		self._create_tensors()
 
 	def _create_tensors(self):
 		self.X = tf.placeholder('float32', [None, self.TIMESTEPS, self.NUM_INPUT])
+
 		self.Y = tf.placeholder('int8', [None, self.num_classes])
 
 		# weights and biases
