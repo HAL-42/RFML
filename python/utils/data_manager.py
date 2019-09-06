@@ -6,7 +6,8 @@
 @software: PyCharm
 @file: data_manager.py
 @time: 2019/7/30 14:45
-@desc:
+@desc: This module sucks. It's a bad sample of programming. View the source code of pytorch's Dataloader, that's
+the right way to perform a data manager.
 """
 import os
 import numpy as np
@@ -52,6 +53,13 @@ class DataManager(object):
         y = np.zeros((self.classes_num,), dtype=np.int)
         y[self.classes_list.index(label)] = 1
         return y
+
+    def _complex_normalize(self, IQ_data):
+        IQ_data = IQ_data.reshape(2, -1)
+        I, Q = IQ_data[0], IQ_data[1]
+        normalize_factor = np.sqrt(np.max(I ** 2 + Q ** 2))
+        I, Q = I / normalize_factor, Q / normalize_factor
+        return np.append(I, Q)
 
     def _get_sample(self, phase:str, index):
         if phase ==  'train':
@@ -101,6 +109,7 @@ class DataManager(object):
                     x = np.concatenate((I_data[0::self.down_sample], Q_data[0::self.down_sample]))
                 else:
                     x = np.concatenate((I_data, Q_data))
+                x = self._complex_normalize(x)
                 return x, y
         else:
             raise IllegalPhaseError("Phase Parameter Should be train or test")
@@ -161,3 +170,17 @@ class DataManager(object):
             xs.append(x)
             ys.append(y)
         return np.array(xs), np.array(ys)
+
+    @staticmethod
+    def add_complex_gaussian_noise(data, SNR, I_only=True):
+        if I_only:
+            P_signal = np.mean(data ** 2, axis=1, keepdims=True)
+        else:
+            data = data.reshape(1, 2, -1)
+            I, Q = data[:, 0::2, :].squeeze(), data[:, 1::2, :].squeeze()
+            P_signal = np.mean(I ** 2 + Q ** 2, axis=1, keepdims=True)
+        sigma = np.sqrt(P_signal / 2) * np.power(10, - SNR / 20)
+        noise_data = data.reshape(data.shape[0], -1)
+        noise = sigma * np.random.randn(noise_data.shape[0], noise_data.shape[1])
+        noise_data = noise_data + noise
+        return noise_data
