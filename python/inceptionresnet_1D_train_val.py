@@ -50,8 +50,14 @@ K.LearningRate = 0.001
 # - Set None for no Exponential LR(About go down to 0.0005 for 1 epoch)
 # K.ExponentialLR = np.power(0.00005 / 0.045, 1 / (16000 / K.TrainLogInterval * K.SnapshotMultiplier * K.SnapshotMultiplier))
 K.ExponentialLR = None
-# * Other Setting: Should Use both I+Q or just use I to train
+# * Other Setting
+# - Should Use both I+Q or just use I to train
 K.IOnly = True
+# - SNR, None means no noise added
+K.IsNoise = False
+K.SNR_floor = -5
+K.SNR_ceil = 30
+K.random_SNR_generate = lambda : np.random.uniform(K.SNR_floor, K.SNR_ceil)
 # ! Automatic Generated Setting
 K.LogDir = os.path.join('.', 'log', f'torch.{os.path.split(K.H5DataDir)[1]}.ICRS.{K.LogDirComment}.log')
 K.SummaryDir = os.path.join(K.LogDir, 'summary')
@@ -132,7 +138,8 @@ if __name__ == '__main__':
                 # Test in eval+no_grad mode
                 with torch.no_grad():
                     net.eval()
-                    test_loss, test_accuracy = TestSamples(test_X, test_Y, net, tester, batch_size=K.TestBatchSize)
+                    test_loss, test_accuracy = TestSamples(test_X, test_Y, net, tester,
+                                                           I_only=K.IOnly, batch_size=K.TestBatchSize, SNR_generate=K.random_SNR_generate)
                 net.train()
                 writer.add_scalar('test/loss', test_loss, global_step=iteration)
                 writer.add_scalar('test/accuracy', test_accuracy, global_step=iteration)
@@ -156,6 +163,8 @@ if __name__ == '__main__':
                     process_bar.SkipMsg(f"Current lr is {exp_scheduler.get_lr()}", logger)
             # * Process Batch Data
             batch_X, cpu_batch_Y = train_batch
+            if K.IsNoise:
+                batch_X = data_manager.add_complex_gaussian_noise(batch_X, SNR=K.random_SNR_generate(), I_only=K.IOnly)
             batch_X = batch_X.reshape(batch_X.shape[0], 1 if K.IOnly else 2, -1)
             batch_X = torch.tensor(batch_X, dtype=torch.float32, device='cuda')
             batch_Y = torch.tensor(cpu_batch_Y, dtype=torch.float32, device='cuda')

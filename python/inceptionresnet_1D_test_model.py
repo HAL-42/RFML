@@ -37,6 +37,10 @@ K.Device = 'cuda'
 # K.HotClean = False
 # * Other settings
 K.IOnly = True       # Use I or both I+Q for testing
+# - Add noise to test or not
+K.IsNoise = False
+K.ConstantSNR = 30
+K.constant_SNR_generator = lambda : K.SNR
 # * Test Mode Setting
 K.IsCompletelyTest = True
 K.IsErrorInspect = True
@@ -90,7 +94,7 @@ def RandomSelectWaves(gt_class, predict_class, tester, data_manager, max_to_sele
         return waves
 
 
-def TestSamples(samples, gts, net, tester, device='cuda', batch_size=K.BatchSize):
+def TestSamples(samples, gts, net, tester, device='cuda', I_only = True, batch_size=K.BatchSize, SNR_generate=None):
     sum_loss = 0
     i1 = 0
     while i1 < len(samples):
@@ -98,7 +102,9 @@ def TestSamples(samples, gts, net, tester, device='cuda', batch_size=K.BatchSize
             i2 = i1 + batch_size
         else:
             i2 = len(samples)
-        batch_X = samples[i1:i2].reshape(i2 - i1, 1 if K.IOnly else 2, -1)
+        batch_X = samples[i1:i2].reshape(i2 - i1, 1 if I_only else 2, -1)
+        if SNR_generate:
+            batch_X = DataManager.add_complex_gaussian_noise(batch_X, SNR=SNR_generate(), I_only=I_only)
         batch_X = torch.tensor(batch_X, dtype=torch.float32, device=device)
         cpu_batch_Y = gts[i1:i2]
         batch_Y = torch.tensor(cpu_batch_Y, dtype=torch.float32, device=device)
@@ -124,7 +130,8 @@ def ErrorInspect(data_manager, net, tester):
             samples, gts = data_manager.get_random_test_samples(K.TestSamplesNum)
             # if K.HotClean:
             #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
-            TestSamples(samples, gts, net, tester, device=K.Device)
+            TestSamples(samples, gts, net, tester,
+                        I_only=K.IOnly, device=K.Device, SNR_generate=K.constant_SNR_generator)
         # ! Decide whether use this test result
         usr_select = input("Start Inspection input i; Retest input others: ")
         if usr_select != 'i':
@@ -183,7 +190,8 @@ def CompletelyTest(data_manager, net, tester):
         samples, gts = test_batch
         # if K.HotClean:
         #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
-        TestSamples(samples, gts, net, tester, device=K.Device)
+        TestSamples(samples, gts, net, tester,
+                    I_only=K.IOnly, device=K.Device, SNR_generate=K.constant_SNR_generator)
         tester.show_confusion_matrix()
 
         process_bar.UpdateBar(i + 1)
