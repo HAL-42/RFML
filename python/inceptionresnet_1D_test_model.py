@@ -18,7 +18,7 @@ from utils.multi_classification_testor import MultiClassificationTester
 from matplotlib import pyplot as plt
 from data_process_patch import BatchCleaner
 from inceptionresnet_v2_model.inceptionresnet_1D import InceptionResNet1D
-from inceptionresnet_v2_model.torch_saver import Saver
+from utils.torch_saver import Saver
 
 from my_py_tools.const import Const
 K = Const()

@@ -15,7 +15,7 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 from inceptionresnet_v2_model.inceptionresnet_1D import InceptionResNet1D
 from utils.data_manager import DataManager
-from inceptionresnet_v2_model.torch_saver import Saver
+from utils.torch_saver import Saver
 from utils.multi_classification_testor import MultiClassificationTester
 from my_py_tools.my_logger import Logger
 from my_py_tools.my_process_bar import ProcessBar
