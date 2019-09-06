@@ -14,7 +14,7 @@ from typing import Optional
 from my_py_tools.my_logger import sh_logger
 import seaborn as sns
 from matplotlib import pyplot as plt
-import json
+import re
 
 
 class MultiClassificationTester(object):
@@ -118,10 +118,13 @@ class MultiClassificationTester(object):
 
         # 显示图形
         fig = plt.gcf()
+        if img_save_path:
+            fig.savefig(img_save_path, dpi=600)
+            txt_save_path = re.sub(r'\.png$', '.txt', img_save_path)
+            np.savetxt(txt_save_path, self.confusion_matrix, fmt='%d')
         plt.figure()
         plt.show()
-        if img_save_path:
-            fig.savefig(img_save_path)
+
         print("********Confusion Matric********")
         print(self.pd_confusion_matrix)
 
