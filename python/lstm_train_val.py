@@ -8,14 +8,14 @@ from my_py_tools.my_process_bar import ProcessBar
 import time
 
 # ! Manual Setting
-kBatchSize = 32
+kBatchSize = 2048
 kLearningRate = 0.001
 kNumEpochs = 30
-kSnapshotMaxToKeep = 20
-kHiddenStateNum = 1024
+kSnapshotMaxToKeep = 25
+kHiddenStateNum = 2048
 
 kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-kLogPathComment = 'B32-lre-3'
+kLogPathComment = 'B2048-lre-3-hs2048'
 
 kIsRecover = False
 kRecoverEpochNum = 19
