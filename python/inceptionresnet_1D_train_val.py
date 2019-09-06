@@ -27,26 +27,28 @@ K = Const()
 # ! Manual Setting
 # * Path Setting
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-K.LogDirComment = 'V2-B27-lre-3'
+K.LogDirComment = 'V2-B27-lrExp'
 # * Model ,Optimizer and Recover Setting
-K.IsRecover = True
+K.IsRecover = False
 K.LoadModelNum = 7200
 # ** Model Init Setting
 K.ModelSettings = {
     'num_incept_A': 10, 'num_incept_B': 20, 'num_incept_C': 10,
     'scale_A': 0.17, 'scale_B': 0.1, 'scale_C': 0.2
 }
-# ** Optimizer Setting
-K.LearningRate = 0.001
 # * Training Setting
 K.BatchSize = 27
-K.NumEpochs = 20
+K.NumEpochs = 5
 # * Log, test and Snapshot Setting
 K.TrainLogInterval = 10
 K.TestLogMultiplier = 30
 K.SnapshotMultiplier = 2
 K.TestSamplesNum = 2500
 K.TestBatchSize = 100
+# ** Optimizer Setting
+K.LearningRate = 0.045
+# - Set None for no Exponential LR(About go down to 0.0005 for 1 epoch)
+K.ExponentialLR = np.power(0.00005 / 0.045, 1 / (16000 / K.TrainLogInterval * K.SnapshotMultiplier * K.SnapshotMultiplier))
 # * Other Setting: Should Use both I+Q or just use I to train
 K.IOnly = True
 # ! Automatic Generated Setting
@@ -76,12 +78,16 @@ if __name__ == '__main__':
         net = InceptionResNet1D(data_manager.classes_num, **K.ModelSettings)
         # dummy_input = torch.randn((1, net.input_size[1], net.input_size[2]), dtype=torch.float32)
         optimizer = torch.optim.Adam(net.parameters(), lr=K.LearningRate)
+        if K.ExponentialLR != None:
+            exp_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, K.ExponentialLR, last_epoch=-1)
         # saver.save(model_num=-1, model=net, optimizer=optimizer)
         iteration = 0
         net.cuda()
     else:
         net, optimizer = saver.restore(K.LoadModelNum,model_cls=InceptionResNet1D,
                                        optimizer_cls=torch.optim.Adam, device='cuda')
+        if K.ExponentialLR != None:
+            exp_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, K.ExponentialLR, last_epoch=K.LoadModelNum)
         # ** If recover training, start at recover iteration
         iteration = K.LoadModelNum
     # * Start training
@@ -119,7 +125,7 @@ if __name__ == '__main__':
                                                                    train_accuracy), logger)
             # ! If comes to test iteration, test part of test set samples
             if iteration % (K.TrainLogInterval * K.TestLogMultiplier) == 0:
-                process_bar.SkipMsg('/*******Now Test the Model*******/')
+                process_bar.SkipMsg('/*******Now Test the Model*******/', logger)
                 # * Get test data
                 test_X, test_Y = data_manager.get_random_test_samples(K.TestSamplesNum)
                 # Test in eval+no_grad mode
@@ -143,6 +149,10 @@ if __name__ == '__main__':
                     f"Taking Snapshot of current model as {os.path.split(K.SnapshotFileStr.format(iteration))[1]}",
                                     logger)
                 saver.save(iteration, net, optimizer, model_init_dict=net.model_init_dict)
+                # ! Also decrease the lr here
+                if K.ExponentialLR != None:
+                    exp_scheduler.step()
+                    process_bar.SkipMsg(f"Current lr is {exp_scheduler.get_lr()}", logger)
             # * Process Batch Data
             batch_X, cpu_batch_Y = train_batch
             batch_X = batch_X.reshape(batch_X.shape[0], 1 if K.IOnly else 2, -1)
