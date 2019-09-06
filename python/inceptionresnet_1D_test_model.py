@@ -117,6 +117,7 @@ def ErrorInspect(data_manager, net, tester):
     while True:
         if first_inspect and K.IsCompletelyTest:
             tester.show_confusion_matrix()
+            first_inspect = False           # If not completely test, then is first inspect is unimportant
         else:
             # ! Get a test batch then show test result
             tester.restart()
@@ -124,8 +125,6 @@ def ErrorInspect(data_manager, net, tester):
             # if K.HotClean:
             #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
             TestSamples(samples, gts, net, tester, device=K.Device)
-        if first_inspect:
-            first_inspect = False
         # ! Decide whether use this test result
         usr_select = input("Start Inspection input i; Retest input others: ")
         if usr_select != 'i':
