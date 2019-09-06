@@ -27,13 +27,13 @@ K = Const()
 # ! Manual Setting
 # * Path Setting
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-K.LogDirComment = 'V2-B27-lrExp'
+K.LogDirComment = 'V1-B27-lre-3'
 # * Model ,Optimizer and Recover Setting
 K.IsRecover = False
 K.LoadModelNum = 7200
 # ** Model Init Setting
 K.ModelSettings = {
-    'num_incept_A': 10, 'num_incept_B': 20, 'num_incept_C': 10,
+    'num_incept_A': 5, 'num_incept_B': 10, 'num_incept_C': 5,
     'scale_A': 0.17, 'scale_B': 0.1, 'scale_C': 0.2
 }
 # * Training Setting
@@ -46,9 +46,10 @@ K.SnapshotMultiplier = 2
 K.TestSamplesNum = 2500
 K.TestBatchSize = 100
 # ** Optimizer Setting
-K.LearningRate = 0.045
+K.LearningRate = 0.001
 # - Set None for no Exponential LR(About go down to 0.0005 for 1 epoch)
-K.ExponentialLR = np.power(0.00005 / 0.045, 1 / (16000 / K.TrainLogInterval * K.SnapshotMultiplier * K.SnapshotMultiplier))
+# K.ExponentialLR = np.power(0.00005 / 0.045, 1 / (16000 / K.TrainLogInterval * K.SnapshotMultiplier * K.SnapshotMultiplier))
+K.ExponentialLR = None
 # * Other Setting: Should Use both I+Q or just use I to train
 K.IOnly = True
 # ! Automatic Generated Setting
