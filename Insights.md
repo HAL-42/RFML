@@ -14,8 +14,8 @@ Omitted
 * A Program to give fake mac address
 * Collect Data of same_module_same_mac, same_module_diff_mac, diff_module_diff_mac(mini5&43)[CSV]
 * Trunk & Normalize the data
-  * **TODO**: 2-D Normalize
-  * **TODO**: Noise Add
+  * Complex Normalize Program
+  * Complex Gaussian Noise Add Program
 * Generate each module's dataset + pre-split Train/Test dataset  from each dataset[h5]
 * Solve the quite tail problem[clean_h5]
 
