@@ -23,3 +23,6 @@ snapshot/
 #log
 **/log
 *.log
+
+#tmp file
+tmp.py
