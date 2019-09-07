@@ -23,10 +23,10 @@ kIsCompletelyTest = True
 kIsErrorInspect = True
 
 kBatchSize = 2048
-kLoadModelNum = 59
+kLoadModelNum = 19
 
 kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
-kLogPathComment = 'B2048-lre-3'
+kLogPathComment = 'B32-lre-3'
 
 kHotClean = False
 
@@ -172,8 +172,6 @@ def CompletelyTest(data_manager, graph, sess, tester):
         #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
         if not kIOnly:
             batch_X = ZipIQ(batch_X)
-        if kIOnly:
-            batch_X = np.append(batch_X[:, 0::2], batch_X[:, 1::2], axis=1)
         batch_X = batch_X.reshape((batch_X.shape[0], input_X.shape[1], input_X.shape[2]))
         batch_probability = sess.run(softmax_output, feed_dict={input_X: batch_X})
 
