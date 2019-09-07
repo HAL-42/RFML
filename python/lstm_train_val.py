@@ -120,10 +120,7 @@ if __name__ == '__main__':
                 process_bar.UpdateBar(i + 1)
             process_bar.Close()
             # ! Save model for this epoch
-            if kIsRecover:
-                saver.save(sess, kSnapshotPath, global_step=epoch + kRecoverEpochNum + 1)
-            else:
-                saver.save(sess, kSnapshotPath, global_step=epoch)
+            saver.save(sess, kSnapshotPath, global_step=epoch)
             logger.info("It Cost {}s to finish this epoch".format(time.time() - epoch_start_time))
         train_writer.close()
         test_writer.close()
