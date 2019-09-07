@@ -43,7 +43,7 @@ K.ConstantSNR = 30
 K.constant_SNR_generator = lambda : K.ConstantSNR
 # * Test Mode Setting
 K.IsCompletelyTest = True
-K.IsErrorInspect = False
+K.IsErrorInspect = True
 # ** Unimportant Constant
 K.InspectImgDPI = 600
 # ! Automatic Generated Const
