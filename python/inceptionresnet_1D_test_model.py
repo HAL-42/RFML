@@ -26,9 +26,9 @@ K = Const()
 # ! Manual Setting Const
 # * Path Setting
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
-K.LogDirComment = ''
+K.LogDirComment = 'V2-B27-lre-3'
 # * Recover Setting
-K.LoadModelNum = 900
+K.LoadModelNum = 300
 # * Testing Setting
 K.BatchSize = 500
 K.TestSamplesNum = 1000
@@ -40,10 +40,10 @@ K.IOnly = True       # Use I or both I+Q for testing
 # - Add noise to test or not
 K.IsNoise = False
 K.ConstantSNR = 30
-K.constant_SNR_generator = lambda : K.SNR
+K.constant_SNR_generator = lambda : K.ConstantSNR
 # * Test Mode Setting
 K.IsCompletelyTest = True
-K.IsErrorInspect = True
+K.IsErrorInspect = False
 # ** Unimportant Constant
 K.InspectImgDPI = 600
 # ! Automatic Generated Const
@@ -104,9 +104,10 @@ def TestSamples(samples, gts, net, tester, device='cuda', I_only = True, batch_s
             i2 = i1 + batch_size
         else:
             i2 = len(samples)
-        batch_X = samples[i1:i2].reshape(i2 - i1, 1 if I_only else 2, -1)
+        batch_X = samples[i1:i2]
         if SNR_generate:
             batch_X = DataManager.add_complex_gaussian_noise(batch_X, SNR=SNR_generate(), I_only=I_only)
+        batch_X = batch_X.reshape(i2 - i1, 1 if I_only else 2, -1)
         batch_X = torch.tensor(batch_X, dtype=torch.float32, device=device)
         cpu_batch_Y = gts[i1:i2]
         batch_Y = torch.tensor(cpu_batch_Y, dtype=torch.float32, device=device)
@@ -133,7 +134,8 @@ def ErrorInspect(data_manager, net, tester):
             # if K.HotClean:
             #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
             TestSamples(samples, gts, net, tester,
-                        I_only=K.IOnly, device=K.Device, SNR_generate=K.constant_SNR_generator)
+                        I_only=K.IOnly, device=K.Device,
+                        SNR_generate=K.constant_SNR_generator if K.IsNoise else None)
         # ! Decide whether use this test result
         usr_select = input("Start Inspection input i; Retest input others: ")
         if usr_select != 'i':
@@ -193,7 +195,8 @@ def CompletelyTest(data_manager, net, tester):
         # if K.HotClean:
         #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
         TestSamples(samples, gts, net, tester,
-                    I_only=K.IOnly, device=K.Device, SNR_generate=K.constant_SNR_generator)
+                    I_only=K.IOnly, device=K.Device,
+                    SNR_generate=K.constant_SNR_generator if K.IsNoise else None)
         tester.show_confusion_matrix()
 
         process_bar.UpdateBar(i + 1)

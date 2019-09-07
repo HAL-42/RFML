@@ -139,7 +139,8 @@ if __name__ == '__main__':
                 with torch.no_grad():
                     net.eval()
                     test_loss, test_accuracy = TestSamples(test_X, test_Y, net, tester,
-                                                           I_only=K.IOnly, batch_size=K.TestBatchSize, SNR_generate=K.random_SNR_generate)
+                                                           I_only=K.IOnly, batch_size=K.TestBatchSize,
+                                                           SNR_generate=K.random_SNR_generate if K.IsNoise else None)
                 net.train()
                 writer.add_scalar('test/loss', test_loss, global_step=iteration)
                 writer.add_scalar('test/accuracy', test_accuracy, global_step=iteration)
