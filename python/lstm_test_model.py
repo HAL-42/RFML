@@ -31,6 +31,8 @@ kLogPathComment = 'B32-lre-3'
 kHotClean = False
 
 kIOnly = True
+# ** Unimportant Const
+kInspectImgDPI = 600
 # ! Automatic Generated Const
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
 kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
@@ -49,7 +51,7 @@ def ZipIQ(batch_IQ):
 def PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list):
     error_waves_num = len(error_waves_list)
 
-    plt.figure()
+    plt.figure(dpi=kInspectImgDPI)
     # ! Plot Ground Truth Reference Wave
     plt.subplot(2 + error_waves_num, 1, 1)
     plt.title('Ground Truth Class Wave')

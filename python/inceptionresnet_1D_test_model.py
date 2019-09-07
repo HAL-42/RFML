@@ -44,6 +44,8 @@ K.constant_SNR_generator = lambda : K.SNR
 # * Test Mode Setting
 K.IsCompletelyTest = True
 K.IsErrorInspect = True
+# ** Unimportant Constant
+K.InspectImgDPI = 600
 # ! Automatic Generated Const
 K.H5ModuleDataDir = os.path.join(K.H5DataDir, 'h5_module_data')
 K.H5TrainTestDataDir = os.path.join(K.H5DataDir, 'h5_train_test_split')
@@ -56,7 +58,7 @@ K.SnapshotFileStr = os.path.join(K.LogDir, 'snapshot', 'InceptionResNet1D-{}.sna
 def PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list):
     error_waves_num = len(error_waves_list)
 
-    plt.figure()
+    plt.figure(dpi=K.InspectImgDPI)
     # ! Plot Ground Truth Reference Wave
     plt.subplot(2 + error_waves_num, 1, 1)
     plt.title('Ground Truth Class Wave')
