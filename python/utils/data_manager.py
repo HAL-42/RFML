@@ -174,7 +174,7 @@ class DataManager(object):
     @staticmethod
     def add_complex_gaussian_noise(data, SNR, I_only=True):
         if I_only:
-            P_signal = np.mean(data ** 2, axis=1, keepdims=True)
+            P_signal = np.mean(data ** 2, axis=1, keepdims=True) * 2 # Power of I is half of the power of signal
         else:
             data = data.reshape(1, 2, -1)
             I, Q = data[:, 0::2, :].squeeze(), data[:, 1::2, :].squeeze()
