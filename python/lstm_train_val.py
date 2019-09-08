@@ -6,21 +6,22 @@ from utils.data_manager import DataManager
 from my_py_tools.my_logger import Logger
 from my_py_tools.my_process_bar import ProcessBar
 import time
+from lstm_test_model import ZipIQ
 
 # ! Manual Setting
 kBatchSize = 2048
 kLearningRate = 0.001
 kNumEpochs = 30
 kSnapshotMaxToKeep = 25
-kHiddenStateNum = 2048
+kHiddenStateNum = 1024
 
 kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-kLogPathComment = 'B2048-lre-3-hs2048'
+kLogPathComment = 'B2048-lre-3-hs1024-IQ'
 
-kIsRecover = True
+kIsRecover = False
 kRecoverEpochNum = 6
 
-kIOnly = True
+kIOnly = False
 # ! Automatic Generated
 kH5ModuleDataPath = os.path.join(kH5DataPath, 'h5_module_data')
 kH5TrainTestDataPath = os.path.join(kH5DataPath, 'h5_train_test_split')
@@ -32,20 +33,13 @@ kRecoverMetaFile = kSnapshotPath + '-{}.meta'.format(kRecoverEpochNum)
 kRecoverDataFile = kSnapshotPath + '-{}'.format(kRecoverEpochNum)
 
 
-def ZipIQ(batch_IQ):
-    zip_batch_IQ = np.empty(batch_IQ.shape, dtype=np.float32)
-    zip_batch_IQ[:, 0::2] = batch_IQ[:, :batch_IQ.shape[1] / 2]
-    zip_batch_IQ[:, 1::2] = batch_IQ[:, batch_IQ.shape[1] / 2:]
-    return zip_batch_IQ
-
-
 if __name__ == '__main__':
     # data and log manager
-    data_manager = DataManager(kH5TrainTestDataPath, kH5ModuleDataPath, I_only=True, down_sample=0)
+    data_manager = DataManager(kH5TrainTestDataPath, kH5ModuleDataPath, I_only=kIOnly, down_sample=0)
     logger = Logger(os.path.join(kLogPath, 'lstm_train_val.log')).logger
 
     # build model
-    lstm_model = BuildModel(data_manager.classes_num, num_hidden=kHiddenStateNum)
+    lstm_model = BuildModel(data_manager.classes_num, num_hidden=kHiddenStateNum, I_only=kIOnly)
     lstm_model.build()
 
     loss = lstm_model.loss()
@@ -105,6 +99,8 @@ if __name__ == '__main__':
                     train_writer.add_summary(train_summary, iteration)
 
                     test_X, test_Y = data_manager.get_random_test_samples(kBatchSize)
+                    if not kIOnly:
+                        test_X = ZipIQ(test_X)
                     test_X = test_X.reshape(test_X.shape[0], lstm_model.TIMESTEPS, -1)
                     test_summary, current_accuracy = \
                         sess.run([merged, accuracy], feed_dict={lstm_model.X: test_X, lstm_model.Y: test_Y})
