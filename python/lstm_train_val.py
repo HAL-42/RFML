@@ -17,8 +17,8 @@ kHiddenStateNum = 2048
 kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
 kLogPathComment = 'B2048-lre-3-hs2048'
 
-kIsRecover = False
-kRecoverEpochNum = 19
+kIsRecover = True
+kRecoverEpochNum = 6
 
 kIOnly = True
 # ! Automatic Generated

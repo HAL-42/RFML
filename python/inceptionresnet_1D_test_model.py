@@ -25,10 +25,10 @@ K = Const()
 
 # ! Manual Setting Const
 # * Path Setting
-K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
+K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
 K.LogDirComment = 'V2-B27-lre-3'
 # * Recover Setting
-K.LoadModelNum = 300
+K.LoadModelNum = 16200
 # * Testing Setting
 K.BatchSize = 500
 K.TestSamplesNum = 1000
@@ -43,7 +43,7 @@ K.ConstantSNR = 30
 K.constant_SNR_generator = lambda : K.ConstantSNR
 # * Test Mode Setting
 K.IsCompletelyTest = True
-K.IsErrorInspect = True
+K.IsErrorInspect = False
 # ** Unimportant Constant
 K.InspectImgDPI = 600
 # ! Automatic Generated Const

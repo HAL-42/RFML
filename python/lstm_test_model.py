@@ -20,13 +20,13 @@ from data_process_patch import BatchCleaner
 
 # ! Manual Setting Const
 kIsCompletelyTest = True
-kIsErrorInspect = True
+kIsErrorInspect = False
 
 kBatchSize = 2048
-kLoadModelNum = 19
+kLoadModelNum = 75
 
-kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_mini5')
-kLogPathComment = 'B32-lre-3'
+kH5DataPath = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
+kLogPathComment = 'B2048-lre-3-hs1024'
 
 kHotClean = False
 

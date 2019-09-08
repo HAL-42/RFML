@@ -27,7 +27,7 @@ K = Const()
 # ! Manual Setting
 # * Path Setting
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-K.LogDirComment = 'V1-B27-lre-3'
+K.LogDirComment = 'V1-B27-lre-3-IQ'
 # * Model ,Optimizer and Recover Setting
 K.IsRecover = False
 K.LoadModelNum = 7200
@@ -52,7 +52,7 @@ K.LearningRate = 0.001
 K.ExponentialLR = None
 # * Other Setting
 # - Should Use both I+Q or just use I to train
-K.IOnly = True
+K.IOnly = False
 # - SNR, None means no noise added
 K.IsNoise = False
 K.SNR_floor = -5
