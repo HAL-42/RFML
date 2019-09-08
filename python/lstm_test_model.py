@@ -43,8 +43,8 @@ kTestResultPath = os.path.join(kLogPath, f'final_test_result-{kLoadModelNum}')
 
 def ZipIQ(batch_IQ):
     zip_batch_IQ = np.empty(batch_IQ.shape, dtype=np.float32)
-    zip_batch_IQ[:, 0::2] = batch_IQ[:, :batch_IQ.shape[1] / 2]
-    zip_batch_IQ[:, 1::2] = batch_IQ[:, batch_IQ.shape[1] / 2:]
+    zip_batch_IQ[:, 0::2] = batch_IQ[:, :batch_IQ.shape[1] // 2]
+    zip_batch_IQ[:, 1::2] = batch_IQ[:, batch_IQ.shape[1] // 2:]
     return zip_batch_IQ
 
 
