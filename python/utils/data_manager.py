@@ -184,3 +184,12 @@ class DataManager(object):
         noise = sigma * np.random.randn(noise_data.shape[0], noise_data.shape[1])
         noise_data = noise_data + noise
         return noise_data
+
+    @staticmethod
+    def increase_complex_gaussian_noise(data, origin_SNR, obj_SNR, I_only=True):
+        pass
+
+
+
+
+

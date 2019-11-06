@@ -331,7 +331,7 @@ We can add this program to training and testing. Or create an new clean dataset.
 
 Theoretically, if we want model to learn analog only and ignore the digital information, each module should send random data, or at least random mac address.
 
-For I'm kink of worrying the the random data is little "hard" for out model, and we can't send totally random mac address(there is format demands) and it need time to read protocol. So finally we set each module's mac address same.
+For I'm kind of worrying the the random data is little "hard" for out model, and we can't send totally random mac address(there is format demands) and it need time to read protocol. So finally we set each module's mac address same.
 
 ***
 

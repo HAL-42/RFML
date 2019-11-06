@@ -27,7 +27,7 @@ K = Const()
 # ! Manual Setting
 # * Path Setting
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-K.LogDirComment = 'V1-B27-lre-3-IQ'
+K.LogDirComment = 'V1-B27-lre-3-SNR'
 # * Model ,Optimizer and Recover Setting
 K.IsRecover = False
 K.LoadModelNum = 7200
@@ -55,8 +55,9 @@ K.ExponentialLR = None
 K.IOnly = False
 # - SNR, None means no noise added
 K.IsNoise = False
-K.SNR_floor = -5
-K.SNR_ceil = 30
+K.SNR_floor = -10
+K.SNR_ceil = 10
+K.SNR_origin = K.SNR_ceil
 K.random_SNR_generate = lambda : np.random.uniform(K.SNR_floor, K.SNR_ceil)
 # ! Automatic Generated Setting
 K.LogDir = os.path.join('.', 'log', f'torch.{os.path.split(K.H5DataDir)[1]}.ICRS.{K.LogDirComment}.log')

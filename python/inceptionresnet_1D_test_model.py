@@ -26,9 +26,9 @@ K = Const()
 # ! Manual Setting Const
 # * Path Setting
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-K.LogDirComment = 'V2-B27-lre-3'
+K.LogDirComment = 'V1-B27-lre-3-IQ'
 # * Recover Setting
-K.LoadModelNum = 16200
+K.LoadModelNum = 31800
 # * Testing Setting
 K.BatchSize = 500
 K.TestSamplesNum = 1000
@@ -36,7 +36,7 @@ K.TestSamplesNum = 1000
 K.Device = 'cuda'
 # K.HotClean = False
 # * Other settings
-K.IOnly = True       # Use I or both I+Q for testing
+K.IOnly = False       # Use I or both I+Q for testing
 # - Add noise to test or not
 K.IsNoise = False
 K.ConstantSNR = 30
@@ -210,13 +210,12 @@ def CompletelyTest(data_manager, net, tester):
 
 if __name__ == '__main__':
     # ! Init saver, sess, and data manager
-    data_manager = DataManager(K.H5TrainTestDataDir, K.H5ModuleDataDir, I_only=True, down_sample=0)
+    data_manager = DataManager(K.H5TrainTestDataDir, K.H5ModuleDataDir, I_only=K.IOnly, down_sample=0)
     data_manager.init_epoch()
     tester = MultiClassificationTester(data_manager.classes_list)
     saver = Saver(K.SnapshotFileStr)
 
     net, _ = saver.restore(K.LoadModelNum, model_cls=InceptionResNet1D, optimizer_cls=None, device=K.Device)
-    net.to(K.Device)
 
     with torch.no_grad():
         net.eval()
