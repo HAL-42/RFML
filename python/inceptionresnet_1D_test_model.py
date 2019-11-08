@@ -96,7 +96,7 @@ def RandomSelectWaves(gt_class, predict_class, tester, data_manager, max_to_sele
         return waves
 
 
-def TestSamples(samples, gts, net, tester, device='cuda', I_only = True, batch_size=K.BatchSize, SNR_generate=None):
+def TestSamples(samples, gts, net, tester, device='cuda', I_only = True, batch_size=K.BatchSize, SNRs_generator=None):
     sum_loss = 0
     i1 = 0
     while i1 < len(samples):
@@ -105,8 +105,8 @@ def TestSamples(samples, gts, net, tester, device='cuda', I_only = True, batch_s
         else:
             i2 = len(samples)
         batch_X = samples[i1:i2]
-        if SNR_generate:
-            batch_X = DataManager.add_complex_gaussian_noise(batch_X, SNR=SNR_generate(), I_only=I_only)
+        if SNRs_generator:
+            batch_X = DataManager.add_complex_gaussian_noise(batch_X, SNRs=SNRs_generator())
         batch_X = batch_X.reshape(i2 - i1, 1 if I_only else 2, -1)
         batch_X = torch.tensor(batch_X, dtype=torch.float32, device=device)
         cpu_batch_Y = gts[i1:i2]
