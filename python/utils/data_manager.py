@@ -172,24 +172,12 @@ class DataManager(object):
         return np.array(xs), np.array(ys)
 
     @staticmethod
-    def add_complex_gaussian_noise(data, SNR, I_only=True):
-        if I_only:
-            P_signal = np.mean(data ** 2, axis=1, keepdims=True) * 2 # Power of I is half of the power of signal
-        else:
-            data = data.reshape(1, 2, -1)
-            I, Q = data[:, 0::2, :].squeeze(), data[:, 1::2, :].squeeze()
-            P_signal = np.mean(I ** 2 + Q ** 2, axis=1, keepdims=True)
-        sigma = np.sqrt(P_signal / 2) * np.power(10, - SNR / 20)
-        noise_data = data.reshape(data.shape[0], -1)
-        noise = sigma * np.random.randn(noise_data.shape[0], noise_data.shape[1])
-        noise_data = noise_data + noise
-        return noise_data
-
-    @staticmethod
-    def increase_complex_gaussian_noise(data, origin_SNR, obj_SNR, I_only=True):
-        pass
-
-
+    def add_complex_gaussian_noise(data, SNRs):
+        P_signal = np.mean(data ** 2, axis=1, keepdims=True) * 2 # Power of I is half of the power of signal
+        SNRs = SNRs.reshape(P_signal.shape)
+        sigma = np.sqrt(P_signal / 2) * np.power(10, - SNRs / 20)
+        noise = sigma * np.random.randn(*data.shape)
+        return data + noise
 
 
 

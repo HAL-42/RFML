@@ -52,13 +52,13 @@ K.LearningRate = 0.001
 K.ExponentialLR = None
 # * Other Setting
 # - Should Use both I+Q or just use I to train
-K.IOnly = False
+K.IOnly = True
 # - SNR, None means no noise added
-K.IsNoise = False
+K.IsNoise = True
+K.SNR_origin = 10
+K.SNR_ceil = K.SNR_origin
 K.SNR_floor = -10
-K.SNR_ceil = 10
-K.SNR_origin = K.SNR_ceil
-K.random_SNR_generate = lambda : np.random.uniform(K.SNR_floor, K.SNR_ceil)
+K.test_SNRs_generator = None
 # ! Automatic Generated Setting
 K.LogDir = os.path.join('.', 'log', f'torch.{os.path.split(K.H5DataDir)[1]}.ICRS.{K.LogDirComment}.log')
 K.SummaryDir = os.path.join(K.LogDir, 'summary')
@@ -67,6 +67,12 @@ K.SnapshotFileStr = os.path.join(K.LogDir, 'snapshot', 'InceptionResNet1D-{}.sna
 
 K.H5ModuleDataDir = os.path.join(K.H5DataDir, 'h5_module_data')
 K.H5TrainTestDataDir = os.path.join(K.H5DataDir, 'h5_train_test_split')
+# Get Train SNR Generator
+def train_SNRs_generator(batch_size):
+    SNR_object = np.random.uniform(K.SNR_floor, K.SNR_ceil, batch_size)
+    return 10 * np.log10((np.power(10, K.SNR_origin/10) + 1) /
+                         (np.power(10, (K.SNR_origin - SNR_object) / 10) - 1))
+K.train_SNRs_generator = train_SNRs_generator
 
 
 if __name__ == '__main__':
@@ -141,7 +147,7 @@ if __name__ == '__main__':
                     net.eval()
                     test_loss, test_accuracy = TestSamples(test_X, test_Y, net, tester,
                                                            I_only=K.IOnly, batch_size=K.TestBatchSize,
-                                                           SNR_generate=K.random_SNR_generate if K.IsNoise else None)
+                                                           SNRs_generator=K.test_SNRs_generator if K.IsNoise else None)
                 net.train()
                 writer.add_scalar('test/loss', test_loss, global_step=iteration)
                 writer.add_scalar('test/accuracy', test_accuracy, global_step=iteration)
@@ -166,7 +172,7 @@ if __name__ == '__main__':
             # * Process Batch Data
             batch_X, cpu_batch_Y = train_batch
             if K.IsNoise:
-                batch_X = data_manager.add_complex_gaussian_noise(batch_X, SNR=K.random_SNR_generate(), I_only=K.IOnly)
+                batch_X = data_manager.add_complex_gaussian_noise(batch_X, SNRs=K.train_SNRs_generator(batch_X.shape[0]))
             batch_X = batch_X.reshape(batch_X.shape[0], 1 if K.IOnly else 2, -1)
             batch_X = torch.tensor(batch_X, dtype=torch.float32, device='cuda')
             batch_Y = torch.tensor(cpu_batch_Y, dtype=torch.float32, device='cuda')
