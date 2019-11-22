@@ -27,7 +27,7 @@ K = Const()
 # ! Manual Setting
 # * Path Setting
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-K.LogDirComment = 'V1-B27-lre-3-SNR-Finetune'
+K.LogDirComment = 'V1-B27-lre-3-SNR-Finetune-lr1e-3'
 # * Model ,Optimizer and Recover Setting
 K.IsRecover = True
 K.LoadModelNum = 25800
@@ -46,7 +46,7 @@ K.SnapshotMultiplier = 2
 K.TestSamplesNum = 2500
 K.TestBatchSize = 100
 # ** Optimizer Setting
-K.LearningRate = 0.0001
+K.LearningRate = 0.001
 # - Set None for no Exponential LR(About go down to 0.0005 for 1 epoch)
 # K.ExponentialLR = np.power(0.00005 / 0.045, 1 / (16000 / K.TrainLogInterval * K.SnapshotMultiplier * K.SnapshotMultiplier))
 K.ExponentialLR = None
@@ -59,6 +59,9 @@ K.SNR_origin = 10
 K.SNR_ceil = K.SNR_origin
 K.SNR_floor = -10
 K.test_SNRs_generator = None
+# - Training Environment Init
+K.IsCudnnBenckmark = False
+K.CUDA_VISIBLE_DEVICES = "2"
 # ! Automatic Generated Setting
 K.LogDir = os.path.join('.', 'log', f'torch.{os.path.split(K.H5DataDir)[1]}.ICRS.{K.LogDirComment}.log')
 K.SummaryDir = os.path.join(K.LogDir, 'summary')
@@ -75,7 +78,14 @@ def train_SNRs_generator(batch_size):
 K.train_SNRs_generator = train_SNRs_generator
 
 
+def init_train_env():
+    torch.backends.cudnn.benchmark = K.IsCudnnBenckmark
+    os.environ["CUDA_VISIBLE_DEVICES"] = K.CUDA_VISIBLE_DEVICES
+
+
 if __name__ == '__main__':
+    # * Init training environment
+    init_train_env()
     # * data, log manager and saver, tester
     data_manager = DataManager(K.H5TrainTestDataDir, K.H5ModuleDataDir, I_only=K.IOnly, down_sample=0)
     logger = Logger(K.TrainValLogFile).logger
@@ -98,8 +108,8 @@ if __name__ == '__main__':
         iteration = 0
         net.cuda()
     else:
-        net, optimizer = saver.restore(K.LoadModelNum,model_cls=InceptionResNet1D,
-                                       optimizer_cls=torch.optim.Adam, device='cuda')
+        net, _ = saver.restore(K.LoadModelNum,model_cls=InceptionResNet1D, device='cuda')
+        optimizer = torch.optim.Adam(net.parameters(), lr=K.LearningRate)
         if K.ExponentialLR != None:
             exp_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, K.ExponentialLR, last_epoch=K.LoadModelNum)
         # ** If recover training, start at recover iteration
