@@ -42,7 +42,7 @@ K.IsNoise = True
 K.SNR_origin = 10
 K.SNR_ceil = K.SNR_origin
 K.SNR_floor = -10
-K.SNR_object = -5
+K.SNR_object = 0
 # * Test Mode Setting
 K.IsCompletelyTest = True
 K.IsErrorInspect = True
