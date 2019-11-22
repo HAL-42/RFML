@@ -27,10 +27,10 @@ K = Const()
 # ! Manual Setting
 # * Path Setting
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-K.LogDirComment = 'V1-B27-lre-3-SNR'
+K.LogDirComment = 'V1-B27-lre-3-SNR-Finetune'
 # * Model ,Optimizer and Recover Setting
-K.IsRecover = False
-K.LoadModelNum = 7200
+K.IsRecover = True
+K.LoadModelNum = 25800
 # ** Model Init Setting
 K.ModelSettings = {
     'num_incept_A': 5, 'num_incept_B': 10, 'num_incept_C': 5,
@@ -38,7 +38,7 @@ K.ModelSettings = {
 }
 # * Training Setting
 K.BatchSize = 27
-K.NumEpochs = 5
+K.NumEpochs = 6
 # * Log, test and Snapshot Setting
 K.TrainLogInterval = 10
 K.TestLogMultiplier = 30
@@ -46,7 +46,7 @@ K.SnapshotMultiplier = 2
 K.TestSamplesNum = 2500
 K.TestBatchSize = 100
 # ** Optimizer Setting
-K.LearningRate = 0.001
+K.LearningRate = 0.0001
 # - Set None for no Exponential LR(About go down to 0.0005 for 1 epoch)
 # K.ExponentialLR = np.power(0.00005 / 0.045, 1 / (16000 / K.TrainLogInterval * K.SnapshotMultiplier * K.SnapshotMultiplier))
 K.ExponentialLR = None

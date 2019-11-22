@@ -26,24 +26,26 @@ K = Const()
 # ! Manual Setting Const
 # * Path Setting
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-K.LogDirComment = 'V1-B27-lre-3-IQ'
+K.LogDirComment = 'V1-B27-lre-3-SNR'
 # * Recover Setting
-K.LoadModelNum = 31800
+K.LoadModelNum = 48000
 # * Testing Setting
-K.BatchSize = 500
+K.BatchSize = 200
 K.TestSamplesNum = 1000
 # * Device Setting: 'cuda' or 'cpu'
 K.Device = 'cuda'
 # K.HotClean = False
 # * Other settings
-K.IOnly = False       # Use I or both I+Q for testing
+K.IOnly = True       # Use I or both I+Q for testing
 # - Add noise to test or not
-K.IsNoise = False
-K.ConstantSNR = 30
-K.constant_SNR_generator = lambda : K.ConstantSNR
+K.IsNoise = True
+K.SNR_origin = 10
+K.SNR_ceil = K.SNR_origin
+K.SNR_floor = -10
+K.SNR_object = -5
 # * Test Mode Setting
 K.IsCompletelyTest = True
-K.IsErrorInspect = False
+K.IsErrorInspect = True
 # ** Unimportant Constant
 K.InspectImgDPI = 600
 # ! Automatic Generated Const
@@ -54,6 +56,11 @@ K.LogDir = os.path.join('.', 'log', f'torch.{os.path.split(K.H5DataDir)[1]}.ICRS
 K.TestResultPath = os.path.join(K.LogDir, f'final_test_result-{K.LoadModelNum}')
 K.SnapshotFileStr = os.path.join(K.LogDir, 'snapshot', 'InceptionResNet1D-{}.snapshot')
 
+def test_SNRs_generator(batch_size):
+    SNR_object = np.ones(batch_size, dtype=np.float32) * K.SNR_object
+    return 10 * np.log10((np.power(10, K.SNR_origin/10) + 1) /
+                         (np.power(10, (K.SNR_origin - SNR_object) / 10) - 1))
+K.test_SNRs_generator = test_SNRs_generator
 
 def PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list):
     error_waves_num = len(error_waves_list)
@@ -93,6 +100,8 @@ def RandomSelectWaves(gt_class, predict_class, tester, data_manager, max_to_sele
         waves = np.array(waves, dtype=np.float32)
         if not K.IOnly:
             waves = waves[:, :waves.shape[1] / 2] # Only return I data
+        if K.IsNoise:
+            waves = data_manager.add_complex_gaussian_noise(waves, K.test_SNRs_generator(waves.shape[0]))
         return waves
 
 
@@ -106,7 +115,7 @@ def TestSamples(samples, gts, net, tester, device='cuda', I_only = True, batch_s
             i2 = len(samples)
         batch_X = samples[i1:i2]
         if SNRs_generator:
-            batch_X = DataManager.add_complex_gaussian_noise(batch_X, SNRs=SNRs_generator())
+            batch_X = DataManager.add_complex_gaussian_noise(batch_X, SNRs=K.test_SNRs_generator(batch_X.shape[0]))
         batch_X = batch_X.reshape(i2 - i1, 1 if I_only else 2, -1)
         batch_X = torch.tensor(batch_X, dtype=torch.float32, device=device)
         cpu_batch_Y = gts[i1:i2]
@@ -135,7 +144,7 @@ def ErrorInspect(data_manager, net, tester):
             #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
             TestSamples(samples, gts, net, tester,
                         I_only=K.IOnly, device=K.Device,
-                        SNR_generate=K.constant_SNR_generator if K.IsNoise else None)
+                        SNRs_generator=K.test_SNRs_generator if K.IsNoise else None)
         # ! Decide whether use this test result
         usr_select = input("Start Inspection input i; Retest input others: ")
         if usr_select != 'i':
@@ -196,7 +205,7 @@ def CompletelyTest(data_manager, net, tester):
         #     batch_X, batch_Y = BatchCleaner(batch_X, batch_Y)
         TestSamples(samples, gts, net, tester,
                     I_only=K.IOnly, device=K.Device,
-                    SNR_generate=K.constant_SNR_generator if K.IsNoise else None)
+                    SNRs_generator=K.test_SNRs_generator)
         tester.show_confusion_matrix()
 
         process_bar.UpdateBar(i + 1)
