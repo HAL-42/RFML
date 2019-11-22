@@ -38,7 +38,7 @@ K.Device = 'cuda'
 # * Other settings
 K.IOnly = True       # Use I or both I+Q for testing
 # - Add noise to test or not
-K.IsNoise = True
+K.IsNoise = False
 K.SNR_origin = 10
 K.SNR_ceil = K.SNR_origin
 K.SNR_floor = -10
@@ -60,7 +60,11 @@ def test_SNRs_generator(batch_size):
     SNR_object = np.ones(batch_size, dtype=np.float32) * K.SNR_object
     return 10 * np.log10((np.power(10, K.SNR_origin/10) + 1) /
                          (np.power(10, (K.SNR_origin - SNR_object) / 10) - 1))
-K.test_SNRs_generator = test_SNRs_generator
+
+if K.IsNoise:
+    K.test_SNRs_generator = test_SNRs_generator
+else:
+    K.test_SNRs_generator = None
 
 def PlotWaveComparisonFig(gt_class_wave, predict_class_wave, error_waves_list):
     error_waves_num = len(error_waves_list)
