@@ -26,9 +26,9 @@ K = Const()
 # ! Manual Setting Const
 # * Path Setting
 K.H5DataDir = os.path.join('..', 'data', 'clean_h5data.diff_module_same_mac_43')
-K.LogDirComment = 'V1-B27-lre-3-SNR'
+K.LogDirComment = 'V1-B27-lre-3-SNR-Finetune-lr1e-3'
 # * Recover Setting
-K.LoadModelNum = 48000
+K.LoadModelNum = 67800
 # * Testing Setting
 K.BatchSize = 200
 K.TestSamplesNum = 1000
@@ -38,14 +38,14 @@ K.Device = 'cuda'
 # * Other settings
 K.IOnly = True       # Use I or both I+Q for testing
 # - Add noise to test or not
-K.IsNoise = False
+K.IsNoise = True
 K.SNR_origin = 10
 K.SNR_ceil = K.SNR_origin
 K.SNR_floor = -10
 K.SNR_object = 5
 # * Test Mode Setting
 K.IsCompletelyTest = True
-K.IsErrorInspect = True
+K.IsErrorInspect = False
 # ** Unimportant Constant
 K.InspectImgDPI = 600
 # ! Automatic Generated Const
